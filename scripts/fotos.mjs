@@ -1,175 +1,151 @@
 /**
- * Prepara las fotos del catálogo para la web. Corre solo antes de `build` y de `dev`.
+ * Prepara las fotos del catálogo para la web.
  *
- * Para cada foto que figura en src/data/catalogo.ts:
- *  1. La baja de Google Drive (la carpeta tiene que estar compartida con el vínculo).
- *  2. Si tiene fondo blanco: recorta el blanco sobrante y centra el producto en un
- *     cuadrado blanco, con aire alrededor. Si tiene otro fondo (fotos de ambiente),
- *     la recorta al cuadrado.
- *  3. La guarda comprimida en WebP en /public/fotos, en 480 px y 1200 px.
+ * Uso:
+ *   node scripts/fotos.mjs <carpeta-originales>
  *
- * Las fotos ya procesadas quedan en caché (.next/cache), así que cada build solo
- * baja las nuevas. Si una foto no se puede bajar, el sitio la muestra desde Drive.
+ * La carpeta tiene que tener cada foto original con el ID de Drive como nombre
+ * (<ID>.jpg / .jpeg / .png). Cómo se encuadra cada una está en scripts/fotos-modos.json:
  *
- * Opcional: FOTOS_LOCAL_DIR=/ruta lee las fotos de esa carpeta (<ID>.jpg/.png/.jpeg)
- * en vez de bajarlas.
+ *  - "desm": desmontables. Mismo aire arriba en todos, el producto ocupa el ancho
+ *            y sigue hasta el borde de abajo.
+ *  - "yute": rollos de yute. El producto ocupa siempre la misma proporción del cuadro.
+ *  - "pad":  la foto entera centrada en el cuadrado (fijos, fotos de costado, hilos).
+ *
+ * Genera /public/fotos/<ID>-480.webp y <ID>-1200.webp, y src/data/fotos.json con
+ * la lista de fotos listas. Las fotos que no estén en la lista se ven desde Drive.
  */
 import fs from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import sharp from "sharp";
 
-const VERSION = "v1"; // cambiar para regenerar todas las fotos
 const CANVAS = 1200;
-const FILL = 0.84; // cuánto del cuadrado ocupa el producto
 const SIZES = [480, 1200];
-const CONCURRENCY = 6;
+
+/** Desmontables: aire arriba y ancho máximo que ocupa el producto. */
+const DESM_TOP = 0.05;
+const DESM_WIDTH = 0.92;
+/** Yute: proporción del cuadro que ocupa el rollo (lado mayor). */
+const YUTE_FILL = 0.88;
 
 const ROOT = process.cwd();
 const OUT = path.join(ROOT, "public", "fotos");
-const CACHE = path.join(ROOT, ".next", "cache", "noire-fotos", VERSION);
 const MANIFEST = path.join(ROOT, "src", "data", "fotos.json");
-const LOCAL_DIR = process.env.FOTOS_LOCAL_DIR;
+const MODOS = JSON.parse(await fs.readFile(path.join(ROOT, "scripts", "fotos-modos.json"), "utf8"));
 
-async function photoIds() {
-  const src = await fs.readFile(path.join(ROOT, "src", "data", "catalogo.ts"), "utf8");
-  // Los IDs de Drive de este catálogo empiezan con "1" y tienen 33 caracteres.
-  return [...new Set([...src.matchAll(/"(1[A-Za-z0-9_-]{30,40})"/g)].map((m) => m[1]))];
+/** Caja del producto (en px de la foto original) y color de fondo. */
+async function analyze(img, w, h) {
+  const aw = 600;
+  const ah = Math.max(1, Math.round((h / w) * aw));
+  const { data } = await img.clone().resize(aw, ah, { fit: "fill" }).removeAlpha().raw().toBuffer({ resolveWithObject: true });
+  const lum = (i) => 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+
+  const corners = [];
+  for (const [cx, cy] of [[0, 0], [aw - 6, 0], [0, ah - 6], [aw - 6, ah - 6]])
+    for (let y = cy; y < cy + 6; y++) for (let x = cx; x < cx + 6; x++) corners.push((y * aw + x) * 3);
+  const median = (k) => corners.map((i) => data[i + k]).sort((a, b) => a - b)[corners.length >> 1];
+  const bg = { r: median(0), g: median(1), b: median(2) };
+  const bgLum = 0.299 * bg.r + 0.587 * bg.g + 0.114 * bg.b;
+  const limit = Math.min(bgLum - 28, 215);
+
+  const rows = new Array(ah).fill(0);
+  const cols = new Array(aw).fill(0);
+  for (let y = 0; y < ah; y++)
+    for (let x = 0; x < aw; x++)
+      if (lum((y * aw + x) * 3) < limit) {
+        rows[y]++;
+        cols[x]++;
+      }
+  const minRow = Math.max(2, aw * 0.004);
+  const minCol = Math.max(2, ah * 0.004);
+  const y0 = rows.findIndex((n) => n >= minRow);
+  const y1 = ah - 1 - [...rows].reverse().findIndex((n) => n >= minRow);
+  const x0 = cols.findIndex((n) => n >= minCol);
+  const x1 = aw - 1 - [...cols].reverse().findIndex((n) => n >= minCol);
+  const k = w / aw;
+  return {
+    bg,
+    box: { x0: x0 * k, y0: y0 * k, x1: (x1 + 1) * k, y1: (y1 + 1) * k },
+  };
 }
 
-async function readSource(id) {
-  if (LOCAL_DIR) {
-    for (const ext of ["jpg", "jpeg", "png", "webp"]) {
-      const p = path.join(LOCAL_DIR, `${id}.${ext}`);
-      if (existsSync(p)) return fs.readFile(p);
-    }
-    throw new Error("no está en FOTOS_LOCAL_DIR");
-  }
-  const urls = [
-    `https://drive.google.com/thumbnail?id=${id}&sz=w2400`,
-    `https://lh3.googleusercontent.com/d/${id}=w2400`,
-  ];
-  let last = "sin respuesta";
-  for (const url of urls) {
-    try {
-      const res = await fetch(url, {
-        redirect: "follow",
-        headers: { "user-agent": "Mozilla/5.0 (NOIRE build)" },
-        signal: AbortSignal.timeout(30000),
-      });
-      const type = res.headers.get("content-type") ?? "";
-      if (res.ok && type.startsWith("image/")) return Buffer.from(await res.arrayBuffer());
-      last = `HTTP ${res.status} ${type}`;
-    } catch (e) {
-      last = e.message;
-    }
-  }
-  throw new Error(last);
+/** Escala la foto, la ubica en el lienzo y recorta lo que sobresale. */
+async function place(img, w, h, s, left, top, bg) {
+  const rw = Math.max(1, Math.round(w * s));
+  const rh = Math.max(1, Math.round(h * s));
+  const resized = await img.clone().resize(rw, rh).png().toBuffer();
+  const ex = { left: Math.max(0, -left), top: Math.max(0, -top) };
+  ex.width = Math.min(rw - ex.left, CANVAS - Math.max(0, left));
+  ex.height = Math.min(rh - ex.top, CANVAS - Math.max(0, top));
+  const piece = await sharp(resized).extract(ex).png().toBuffer();
+  return sharp({ create: { width: CANVAS, height: CANVAS, channels: 3, background: bg } })
+    .composite([{ input: piece, left: Math.max(0, left), top: Math.max(0, top) }])
+    .png()
+    .toBuffer();
 }
 
-/** Color de fondo: blanco si la mayoría del borde es blanco; si no, la mediana del borde. */
-async function borderColor(buf) {
-  const { data, info } = await sharp(buf).resize(48, 48, { fit: "fill" }).raw().toBuffer({ resolveWithObject: true });
-  const { width: W, height: H, channels: C } = info;
-  const px = [];
-  for (let y = 0; y < H; y++)
-    for (let x = 0; x < W; x++) {
-      if (x > 1 && x < W - 2 && y > 1 && y < H - 2) continue;
-      const i = (y * W + x) * C;
-      px.push([data[i], data[i + 1], data[i + 2]]);
-    }
-  const whites = px.filter(([r, g, b]) => r > 228 && g > 228 && b > 228).length;
-  if (whites / px.length >= 0.4) return { white: true, color: { r: 255, g: 255, b: 255 } };
-  const med = (k) => px.map((p) => p[k]).sort((a, b) => a - b)[px.length >> 1];
-  return { white: false, color: { r: med(0), g: med(1), b: med(2) } };
-}
+async function processPhoto(file, mode) {
+  const img = sharp(await fs.readFile(file)).rotate().flatten({ background: "#ffffff" });
+  const { width: w0, height: h0 } = await img.clone().png().toBuffer({ resolveWithObject: true }).then((r) => r.info);
+  const w = w0;
+  const h = h0;
+  const { bg, box } = await analyze(img, w, h);
+  const bw = box.x1 - box.x0;
+  const bh = box.y1 - box.y0;
+  const cx = (box.x0 + box.x1) / 2;
+  const cy = (box.y0 + box.y1) / 2;
 
-async function processPhoto(input) {
-  const base = await sharp(input).rotate().flatten({ background: "#ffffff" }).png().toBuffer();
-  const { white } = await borderColor(base);
-
-  let square;
-  if (white) {
-    let product = base;
-    try {
-      const trimmed = await sharp(base).trim({ background: "#ffffff", threshold: 28 }).png().toBuffer({ resolveWithObject: true });
-      if (trimmed.info.width > 40 && trimmed.info.height > 40) product = trimmed.data;
-    } catch {
-      /* sin bordes para recortar */
-    }
-    const inner = Math.round(CANVAS * FILL);
-    const fitted = await sharp(product).resize(inner, inner, { fit: "inside" }).png().toBuffer({ resolveWithObject: true });
-    square = await sharp({ create: { width: CANVAS, height: CANVAS, channels: 3, background: "#ffffff" } })
-      .composite([
-        {
-          input: fitted.data,
-          left: Math.round((CANVAS - fitted.info.width) / 2),
-          top: Math.round((CANVAS - fitted.info.height) / 2),
-        },
-      ])
-      .png()
-      .toBuffer();
-  } else {
-    square = await sharp(base).resize(CANVAS, CANVAS, { fit: "cover", position: "attention" }).png().toBuffer();
+  if (mode === "desm") {
+    const gap = CANVAS * DESM_TOP;
+    let s = (CANVAS * DESM_WIDTH) / bw;
+    if (bh * s < CANVAS - gap) s = (CANVAS - gap) / bh; // producto bajo: que igual llegue abajo
+    return place(img, w, h, s, Math.round(CANVAS / 2 - cx * s), Math.round(gap - box.y0 * s), bg);
   }
-
-  return Promise.all(
-    SIZES.map(async (size) => ({
-      size,
-      data: await sharp(square).resize(size, size).webp({ quality: size > 600 ? 80 : 76, effort: 5 }).toBuffer(),
-    })),
-  );
-}
-
-async function handle(id, stats) {
-  const names = SIZES.map((s) => `${id}-${s}.webp`);
-  if (names.every((n) => existsSync(path.join(CACHE, n)))) {
-    await Promise.all(names.map((n) => fs.copyFile(path.join(CACHE, n), path.join(OUT, n))));
-    stats.cache++;
-    return true;
+  if (mode === "yute") {
+    const s = (CANVAS * YUTE_FILL) / Math.max(bw, bh);
+    return place(img, w, h, s, Math.round(CANVAS / 2 - cx * s), Math.round(CANVAS / 2 - cy * s), bg);
   }
-  const outputs = await processPhoto(await readSource(id));
-  for (const { size, data } of outputs) {
-    await fs.writeFile(path.join(CACHE, `${id}-${size}.webp`), data);
-    await fs.writeFile(path.join(OUT, `${id}-${size}.webp`), data);
+  // Fotos de ambiente (fondo que no es blanco): recortadas al cuadrado, sin franjas.
+  if (0.299 * bg.r + 0.587 * bg.g + 0.114 * bg.b < 235) {
+    return img.clone().resize(CANVAS, CANVAS, { fit: "cover", position: "attention" }).png().toBuffer();
   }
-  stats.nuevas++;
-  return true;
+  // pad: la foto entera centrada
+  const s = CANVAS / Math.max(w, h);
+  return place(img, w, h, s, Math.round((CANVAS - w * s) / 2), Math.round((CANVAS - h * s) / 2), bg);
 }
 
 async function main() {
-  await fs.mkdir(OUT, { recursive: true });
-  await fs.mkdir(CACHE, { recursive: true });
-  const ids = await photoIds();
-  const ok = [];
-  const fallas = [];
-  const stats = { cache: 0, nuevas: 0 };
-  let next = 0;
-
-  await Promise.all(
-    Array.from({ length: CONCURRENCY }, async () => {
-      while (next < ids.length) {
-        const id = ids[next++];
-        try {
-          if (await handle(id, stats)) ok.push(id);
-        } catch (e) {
-          fallas.push(`${id}: ${e.message}`);
-        }
-      }
-    }),
-  );
-
-  ok.sort();
-  await fs.writeFile(MANIFEST, JSON.stringify(ok, null, 0) + "\n");
-  console.log(`fotos: ${ok.length}/${ids.length} listas (${stats.nuevas} nuevas, ${stats.cache} de caché)`);
-  if (fallas.length) {
-    console.log(`fotos: ${fallas.length} se muestran desde Drive porque no se pudieron procesar:`);
-    for (const f of fallas.slice(0, 10)) console.log(`  - ${f}`);
+  const srcDir = process.argv[2];
+  if (!srcDir) {
+    console.log("Uso: node scripts/fotos.mjs <carpeta con las fotos originales nombradas por ID>");
+    process.exit(1);
   }
+  await fs.mkdir(OUT, { recursive: true });
+  const listas = new Set(existsSync(MANIFEST) ? JSON.parse(await fs.readFile(MANIFEST, "utf8")) : []);
+  let hechas = 0;
+  const faltan = [];
+
+  for (const [id, mode] of Object.entries(MODOS)) {
+    const ext = ["jpg", "jpeg", "png", "webp"].find((e) => existsSync(path.join(srcDir, `${id}.${e}`)));
+    if (!ext) {
+      faltan.push(id);
+      continue;
+    }
+    const square = await processPhoto(path.join(srcDir, `${id}.${ext}`), mode);
+    for (const size of SIZES) {
+      await sharp(square)
+        .resize(size, size)
+        .webp({ quality: size > 600 ? 80 : 76, effort: 6 })
+        .toFile(path.join(OUT, `${id}-${size}.webp`));
+    }
+    listas.add(id);
+    hechas++;
+  }
+
+  await fs.writeFile(MANIFEST, JSON.stringify([...listas].sort()) + "\n");
+  console.log(`fotos: ${hechas} procesadas, ${listas.size} listas en total`);
+  if (faltan.length) console.log(`fotos: ${faltan.length} sin original en la carpeta: ${faltan.join(", ")}`);
 }
 
-main().catch(async (e) => {
-  // Nunca frenar el build por las fotos: en el peor caso se ven desde Drive.
-  console.log(`fotos: no se pudieron preparar (${e.message}). Se usan las de Drive.`);
-  if (!existsSync(MANIFEST)) await fs.writeFile(MANIFEST, "[]\n");
-});
+main();

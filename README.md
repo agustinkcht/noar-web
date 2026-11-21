@@ -36,14 +36,15 @@ Para el dominio `noire.ar`, se configura desde el panel del hosting.
 
 ## Fotos
 
-Las fotos salen de la carpeta de Drive "NOAR - Catálogo Web", que tiene que estar compartida como **"Cualquier persona con el vínculo" → Lector**. Cada producto guarda el ID del archivo de Drive en `src/data/catalogo.ts`.
+Las fotos ya procesadas están en `public/fotos/` (WebP de 480 y 1200 px, de 25 a 150 KB cada una) y se sirven desde el propio sitio. La lista de las que están listas queda en `src/data/fotos.json`; si falta alguna, el sitio la muestra desde Drive.
 
-Antes de cada build corre `scripts/fotos.mjs`, que:
+Cada producto guarda el ID de Drive de sus fotos en `src/data/catalogo.ts`, y la foto procesada lleva ese mismo ID.
 
-1. Baja cada foto de Drive.
-2. Si tiene fondo blanco, recorta el blanco sobrante y centra el producto en un cuadrado blanco con aire alrededor. Si tiene otro fondo (fotos de ambiente), la recorta al cuadrado.
-3. La guarda comprimida en WebP (480 y 1200 px) en `public/fotos/`.
+### Agregar o cambiar fotos
 
-Las fotos procesadas quedan en caché entre builds, así que solo se bajan las nuevas. En el log de Vercel aparece una línea `fotos: N/M listas`. Si alguna foto no se pudo procesar, el sitio la muestra desde Drive (más lenta, pero se ve).
-
-Para regenerar todas, por ejemplo después de cambiar el encuadre, cambiá `VERSION` en `scripts/fotos.mjs`.
+1. Juntá las originales en una carpeta, nombradas con su ID de Drive (`<ID>.jpg` o `.png`).
+2. En `scripts/fotos-modos.json`, indicá cómo encuadrar cada una:
+   - `desm`: desmontables. Mismo aire arriba en todos y el producto llega al borde de abajo.
+   - `yute`: rollos. El rollo ocupa siempre la misma proporción del cuadro.
+   - `pad`: la foto entera centrada en blanco (fijos, hilos). Si el fondo no es blanco (fotos de ambiente), la recorta al cuadrado.
+3. Corré `npm run fotos -- <carpeta>` y subí los cambios.
