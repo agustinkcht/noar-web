@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getProduct } from "@/data/catalogo";
 import { SITE } from "@/lib/config";
-import { lineName, money, moneyPlain, tierIndex, unitPrice, variantImages } from "@/lib/precios";
+import { lineName, money, moneyPlain, tierIndex, tierQty, unitPrice, variantImages } from "@/lib/precios";
 import { useCart } from "./CartProvider";
 import { ProductImage } from "./ProductImage";
 import { QtyStepper } from "./QtyStepper";
@@ -65,24 +65,26 @@ export function CartDrawer() {
             <ul className="drawer-lines">
               {lines.map((l) => {
                 const p = getProduct(l.slug)!;
-                const t = p.tiers[tierIndex(p, l.variant, l.qty)];
-                const unit = unitPrice(p, l.variant, l.qty);
+                const d = l.desl ?? 0;
+                const n = tierQty(lines, l.slug, l.variant);
+                const t = p.tiers[tierIndex(p, l.variant, n)];
+                const unit = unitPrice(p, l.variant, n);
                 return (
-                  <li key={`${l.slug}-${l.variant}`} className="line">
+                  <li key={`${l.slug}-${l.variant}-${d}`} className="line">
                     <Link
                       href={`/catalogo/${p.slug}/`}
                       className="line-img"
                       onClick={() => setOpen(false)}
                     >
                       <ProductImage
-                        id={variantImages(p, l.variant)[0]}
+                        id={variantImages(p, l.variant, d)[0]}
                         alt={p.name}
                         fallback={p.title}
                         sizes="64px"
                       />
                     </Link>
                     <div className="line-body">
-                      <p className="line-name">{lineName(p, l.variant)}</p>
+                      <p className="line-name">{lineName(p, l.variant, d)}</p>
                       <p className="line-meta">
                         {money(unit)} {p.unit}
                         {p.tiers.length > 1 && <span className="tier-chip">{t.label}</span>}
@@ -90,10 +92,10 @@ export function CartDrawer() {
                       <div className="line-actions">
                         <QtyStepper
                           value={l.qty}
-                          onChange={(q) => setQty(l.slug, l.variant, q)}
-                          id={`qty-${l.slug}-${l.variant}`}
+                          onChange={(q) => setQty(l.slug, l.variant, q, d)}
+                          id={`qty-${l.slug}-${l.variant}-${d}`}
                         />
-                        <button type="button" className="link-btn" onClick={() => remove(l.slug, l.variant)}>
+                        <button type="button" className="link-btn" onClick={() => remove(l.slug, l.variant, d)}>
                           Quitar
                         </button>
                       </div>
@@ -137,13 +139,13 @@ export function CartDrawer() {
   );
 }
 
-function buildMessage(lines: { slug: string; variant: number; qty: number }[], subtotal: number) {
+function buildMessage(lines: { slug: string; variant: number; qty: number; desl?: number }[], subtotal: number) {
   const items = lines
     .map((l) => {
       const p = getProduct(l.slug);
       if (!p) return "";
-      const unit = unitPrice(p, l.variant, l.qty);
-      return `*${lineName(p, l.variant)}*\n${l.qty} x ${moneyPlain(unit)} = ${moneyPlain(unit * l.qty)}`;
+      const unit = unitPrice(p, l.variant, tierQty(lines, l.slug, l.variant));
+      return `*${lineName(p, l.variant, l.desl ?? 0)}*\n${l.qty} x ${moneyPlain(unit)} = ${moneyPlain(unit * l.qty)}`;
     })
     .filter(Boolean)
     .join("\n\n");

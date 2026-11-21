@@ -11,29 +11,43 @@ import { QtyStepper } from "./QtyStepper";
 
 export function ProductDetail({ product }: { product: Product }) {
   const { add, setOpen } = useCart();
-  const [variant, setVariant] = useState(0);
+  const deslizadores = product.deslizadores ?? [];
+  const [desl, setDesl] = useState(0);
+  const [variant, setVariant] = useState(deslizadores[0]?.variants[0] ?? 0);
   const [qty, setQty] = useState(1);
   const [photo, setPhoto] = useState(0);
   const [added, setAdded] = useState(false);
 
-  const images = variantImages(product, variant);
+  // Medidas que se pueden elegir con el deslizador actual.
+  const medidas = deslizadores[desl]?.variants ?? product.variants.map((_, i) => i);
+  const images = variantImages(product, variant, desl);
   const tier = tierIndex(product, variant, qty);
   const unit = unitPrice(product, variant, qty);
   const v = product.variants[variant];
   const category = CATEGORIES.find((c) => c.id === product.category)!;
   const available = v.prices.filter((pr) => pr != null).length;
 
-  useEffect(() => setPhoto(0), [variant]);
+  useEffect(() => setPhoto(0), [variant, desl]);
+
+  function chooseDesl(i: number) {
+    setDesl(i);
+    const allowed = deslizadores[i].variants;
+    if (!allowed.includes(variant)) setVariant(allowed[0]);
+  }
 
   // Precarga todas las fotos del producto para que la galería pase sin esperas.
   useEffect(() => {
-    const all = new Set([...product.images, ...product.variants.flatMap((x) => x.images ?? [])]);
+    const all = new Set([
+      ...product.images,
+      ...product.variants.flatMap((x) => x.images ?? []),
+      ...(product.deslizadores ?? []).flatMap((d) => d.images),
+    ]);
     all.forEach((id) => preloadImage(id));
   }, [product]);
 
   function onAdd() {
     if (qty < 1) return;
-    add(product.slug, variant, qty);
+    add(product.slug, variant, qty, desl);
     setAdded(true);
     setTimeout(() => setAdded(false), 2500);
   }
@@ -102,37 +116,75 @@ export function ProductDetail({ product }: { product: Product }) {
         <h1 className="detail-title">{product.name}</h1>
         <p className="muted">{product.subtitle}</p>
 
+        {deslizadores.length > 0 && (
+          <fieldset className="choice">
+            <legend>Deslizador</legend>
+            {deslizadores.length > 1 ? (
+              <div className="segmented" role="group" aria-label="Tipo de deslizador">
+                {deslizadores.map((d, i) => (
+                  <button key={d.nombre} type="button" aria-pressed={i === desl} onClick={() => chooseDesl(i)}>
+                    {d.nombre}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <p className="choice-static">{deslizadores[0].nombre}</p>
+            )}
+          </fieldset>
+        )}
+
         {product.variants.length > 1 && (
           <fieldset className="choice">
             <legend>{product.variantName}</legend>
             <div className="chips">
-              {product.variants.map((vv, i) => (
-                <button
-                  key={vv.label}
-                  type="button"
-                  className="chip"
-                  aria-pressed={i === variant}
-                  onClick={() => setVariant(i)}
-                >
-                  {product.category === "cierres" ? vv.label.replace(" cm", "") : vv.label}
-                </button>
-              ))}
+              {medidas.map((i) => {
+                const vv = product.variants[i];
+                return (
+                  <button
+                    key={vv.label}
+                    type="button"
+                    className="chip"
+                    aria-pressed={i === variant}
+                    onClick={() => setVariant(i)}
+                  >
+                    {product.category === "cierres" ? vv.label.replace(" cm", "") : vv.label}
+                  </button>
+                );
+              })}
             </div>
             {product.category === "cierres" && <p className="muted small">Medidas en centímetros.</p>}
           </fieldset>
         )}
 
-        <div className="tiers" role="table" aria-label="Precio según cantidad">
+        <div className="tiers" role="group" aria-label="Precio según cantidad">
           {product.tiers.map((t, i) => {
             const price = v.prices[i];
             if (price == null) return null;
-            return (
-              <div key={t.key} className="tier-row" role="row" data-active={i === tier}>
-                <span role="cell" className="tier-key">{t.label}</span>
-                <span role="cell" className="tier-range">{available > 1 ? t.rango : "Precio por unidad"}</span>
-                <span role="cell" className="tier-price">
+            const body = (
+              <>
+                <span className="tier-key">{t.label}</span>
+                <span className="tier-range">{available > 1 ? t.rango : "Precio por unidad"}</span>
+                <span className="tier-price">
                   {money(price)} <span className="muted">{product.unit}</span>
                 </span>
+              </>
+            );
+            // Con más de un escalón, tocar uno carga esa cantidad.
+            return available > 1 ? (
+              <button
+                key={t.key}
+                type="button"
+                className="tier-row"
+                data-active={i === tier}
+                aria-pressed={i === tier}
+                aria-label={`Llevar ${t.min} ${t.min === 1 ? "unidad" : "unidades"} a ${money(price)} ${product.unit}`}
+                onClick={() => setQty(t.min)}
+              >
+                {body}
+              </button>
+            ) : (
+              <div key={t.key} className="tier-row" data-active>
+                {body}
               </div>
             );
           })}
@@ -140,7 +192,7 @@ export function ProductDetail({ product }: { product: Product }) {
         {available > 1 && (
           <p className="muted small">
             El precio se calcula por {product.category === "cierres" ? "medida" : "producto"} según la
-            cantidad que lleves.
+            cantidad que lleves. Tocá un escalón para cargar esa cantidad.
           </p>
         )}
 

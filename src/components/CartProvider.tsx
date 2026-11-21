@@ -2,9 +2,12 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { getProduct } from "@/data/catalogo";
-import { unitPrice } from "@/lib/precios";
+import { tierQty, unitPrice } from "@/lib/precios";
 
-export type CartLine = { slug: string; variant: number; qty: number };
+export type CartLine = { slug: string; variant: number; qty: number; desl?: number };
+
+const same = (l: CartLine, slug: string, variant: number, desl: number) =>
+  l.slug === slug && l.variant === variant && (l.desl ?? 0) === desl;
 
 type CartCtx = {
   lines: CartLine[];
@@ -12,14 +15,14 @@ type CartCtx = {
   subtotal: number;
   open: boolean;
   setOpen: (v: boolean) => void;
-  add: (slug: string, variant: number, qty: number) => void;
-  setQty: (slug: string, variant: number, qty: number) => void;
-  remove: (slug: string, variant: number) => void;
+  add: (slug: string, variant: number, qty: number, desl?: number) => void;
+  setQty: (slug: string, variant: number, qty: number, desl?: number) => void;
+  remove: (slug: string, variant: number, desl?: number) => void;
   clear: () => void;
 };
 
 const Ctx = createContext<CartCtx | null>(null);
-const KEY = "noire-pedido-v1";
+const KEY = "noire-pedido-v2"; // v2: medidas filtradas por stock y deslizador
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [lines, setLines] = useState<CartLine[]>([]);
@@ -44,26 +47,26 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     } catch {}
   }, [lines, loaded]);
 
-  const add = useCallback((slug: string, variant: number, qty: number) => {
+  const add = useCallback((slug: string, variant: number, qty: number, desl = 0) => {
     setLines((prev) => {
-      const i = prev.findIndex((l) => l.slug === slug && l.variant === variant);
-      if (i === -1) return [...prev, { slug, variant, qty }];
+      const i = prev.findIndex((l) => same(l, slug, variant, desl));
+      if (i === -1) return [...prev, { slug, variant, qty, desl }];
       const next = [...prev];
       next[i] = { ...next[i], qty: next[i].qty + qty };
       return next;
     });
   }, []);
 
-  const setQty = useCallback((slug: string, variant: number, qty: number) => {
+  const setQty = useCallback((slug: string, variant: number, qty: number, desl = 0) => {
     setLines((prev) =>
       prev
-        .map((l) => (l.slug === slug && l.variant === variant ? { ...l, qty } : l))
+        .map((l) => (same(l, slug, variant, desl) ? { ...l, qty } : l))
         .filter((l) => l.qty > 0),
     );
   }, []);
 
-  const remove = useCallback((slug: string, variant: number) => {
-    setLines((prev) => prev.filter((l) => !(l.slug === slug && l.variant === variant)));
+  const remove = useCallback((slug: string, variant: number, desl = 0) => {
+    setLines((prev) => prev.filter((l) => !same(l, slug, variant, desl)));
   }, []);
 
   const clear = useCallback(() => setLines([]), []);
@@ -74,7 +77,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     for (const l of lines) {
       const p = getProduct(l.slug);
       if (!p) continue;
-      subtotal += unitPrice(p, l.variant, l.qty) * l.qty;
+      subtotal += unitPrice(p, l.variant, tierQty(lines, l.slug, l.variant)) * l.qty;
       count += l.qty;
     }
     return { lines, count, subtotal, open, setOpen, add, setQty, remove, clear };

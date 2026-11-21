@@ -41,7 +41,11 @@ export type Product = {
   tiers: Tier[];
   variants: Variant[];
   images: string[];
+  /** Solo cierres: tipos de deslizador, cada uno con sus fotos y sus medidas (índices de `variants`). */
+  deslizadores?: Deslizador[];
 };
+
+export type Deslizador = { nombre: string; images: string[]; variants: number[] };
 
 export const CATEGORIES: { id: CategoryId; name: string; blurb: string }[] = [
   { id: "cierres", name: "Cierres YKK", blurb: "8 familias · desmontables y fijos" },
@@ -179,8 +183,33 @@ function slugify(s: string) {
     .replace(/(^-|-$)/g, "");
 }
 
-function cierre(family: string, formato: Formato, table: Row[], images: string[]): Product {
+type DeslizadorDef = {
+  nombre: string;
+  images: string[];
+  /** Medidas en stock (cm). Sin lista = todas las de la tabla de precios. */
+  medidas?: number[];
+};
+
+/** Medidas de a 5 cm entre `desde` y `hasta`, inclusive. */
+function deA5(desde: number, hasta: number) {
+  const out: number[] = [];
+  for (let cm = desde; cm <= hasta; cm += 5) out.push(cm);
+  return out;
+}
+
+/**
+ * Un cierre (familia + formato). La tabla trae los precios de todas las medidas;
+ * en el sitio se muestran solo las que estén en stock en algún deslizador.
+ */
+function cierre(family: string, formato: Formato, table: Row[], deslizadores: DeslizadorDef[]): Product {
   const f = FORMATO[formato];
+  const todas = table.map(([cm]) => cm);
+  const desl = deslizadores.map((d) => ({ ...d, medidas: d.medidas ?? todas }));
+  const enStock = new Set(desl.flatMap((d) => d.medidas));
+  for (const cm of enStock) {
+    if (!todas.includes(cm)) throw new Error(`${family} ${f.nombre}: no hay precio para ${cm} cm`);
+  }
+  const rows = table.filter(([cm]) => enStock.has(cm));
   return {
     slug: `cierre-${slugify(family)}-${f.slug}`,
     category: "cierres",
@@ -191,97 +220,126 @@ function cierre(family: string, formato: Formato, table: Row[], images: string[]
     unit: "c/u",
     variantName: "Medida",
     tiers: TIERS_CIERRES,
-    variants: table.map(([cm, ...prices]) => ({ label: `${cm} cm`, prices })),
-    images,
+    variants: rows.map(([cm, ...prices]) => ({ label: `${cm} cm`, prices })),
+    images: desl[0].images,
+    deslizadores: desl.map((d) => ({
+      nombre: d.nombre,
+      images: d.images,
+      variants: rows.map(([cm], i) => (d.medidas.includes(cm) ? i : -1)).filter((i) => i >= 0),
+    })),
   };
 }
+
+const regular = (images: string[], medidas?: number[]): DeslizadorDef => ({ nombre: "Regular", images, medidas });
 
 const CIERRES: Product[] = [
   // Poliéster Reforzado (CIF)
   cierre("Poliéster Reforzado", "desm-c5", POLIESTER_DESM, [
-    "1id5u8rn06OxZJiWRdWH9Jp6qAeE6LN1Y", // Poliéster Reforzado - 1
-    "1i6IsR27QWL3Lzzdg71iOJVB9a2vzGQd9", // Poliéster Reforzado - 2
-    "1Kh0m7dEgY8EuultMO--Q9MHNOE8R9Mni", // cifDc5t580alt-1
-    "1ZyIjeEWz3IyOCAX0rQeWzRO3nVFwq1Q8", // cifDc5t580alt-2
+    regular(
+      [
+        "1id5u8rn06OxZJiWRdWH9Jp6qAeE6LN1Y", // Poliéster Reforzado - 1
+        "1i6IsR27QWL3Lzzdg71iOJVB9a2vzGQd9", // Poliéster Reforzado - 2
+      ],
+      deA5(65, 85),
+    ),
+    {
+      nombre: "Gota",
+      images: [
+        "1Kh0m7dEgY8EuultMO--Q9MHNOE8R9Mni", // cifDc5t580alt-1
+        "1ZyIjeEWz3IyOCAX0rQeWzRO3nVFwq1Q8", // cifDc5t580alt-2
+      ],
+      medidas: deA5(65, 80),
+    },
   ]),
   cierre("Poliéster Reforzado", "fijo-c5", POLIESTER_FIJO, [
-    "1GTMKx8AUx0ufWcn6y0J0GiJDBJn0uadu",
-    "14Amc2TghQYxkLw0pwN-bt9RKCbAATLA8",
+    regular(["1GTMKx8AUx0ufWcn6y0J0GiJDBJn0uadu", "14Amc2TghQYxkLw0pwN-bt9RKCbAATLA8"], [16, 18, 20, 22, 25]),
   ]),
   // Vislon Diente de Perro (VS)
   cierre("Vislon Diente de Perro", "desm-c5", VISLON_DESM, [
-    "1FmE1jQVqmSpfZ8ibQZtEl8Chb2OBnAUV",
-    "1U29QPTJpyPd3XImqPTruB4K-GfMTlwtt",
+    regular(["1FmE1jQVqmSpfZ8ibQZtEl8Chb2OBnAUV", "1U29QPTJpyPd3XImqPTruB4K-GfMTlwtt"], [...deA5(55, 85), 100]),
   ]),
   cierre("Vislon Diente de Perro", "fijo-c5", VISLON_FIJO, [
-    "1Rw0OYwVHdRUG19oG-T7oo_MQPlNLnZir",
-    "1ybCyRAZAnjFzsO_0xwTJLUtpxyMGRM0u",
+    regular(["1Rw0OYwVHdRUG19oG-T7oo_MQPlNLnZir", "1ybCyRAZAnjFzsO_0xwTJLUtpxyMGRM0u"], [14, 16, 18, 20, 25]),
   ]),
   // Aluminio (RA)
   cierre("Aluminio", "desm-c5", ALUMINIO_DESM, [
-    "1AL2wEcXY3UxnWoPrGRCyktWH4ZoP4ANq",
-    "1NDzMKKFRxJcD2E-_pC2cHhcWtQRlo6zw",
+    regular(["1AL2wEcXY3UxnWoPrGRCyktWH4ZoP4ANq", "1NDzMKKFRxJcD2E-_pC2cHhcWtQRlo6zw"], deA5(45, 85)),
   ]),
   cierre("Aluminio", "fijo-c5", ALUMINIO_FIJO, [
-    "1Auw8a05AfAbhjQ_8WKP2FE1HojgAHPYD",
-    "1o7jf5RXI06OHhTZZtzgTAQiIbI15q27C",
+    regular(["1Auw8a05AfAbhjQ_8WKP2FE1HojgAHPYD", "1o7jf5RXI06OHhTZZtzgTAQiIbI15q27C"], [14, 16, 18, 20, 30]),
   ]),
   // Metal Plata Níquel (RN)
   cierre("Metal Plata Níquel", "desm-c5", RN_RG_DESM, [
-    "1VQb5S_JfIgayElkTjihAfwx6WYS7ChYa", // rnDc5t580-1
-    "1ZRLvf0smPOnJpymCOUlPyWmrvwj0bwjZ", // rnDc5t580-2
-    "1-KYGpRqU7x-dbNXW9wutwgkWj0BAknqV", // rnDc5t580argo-1
-    "1TfKZERInH50C3iVSPH-XagPX0i2iM6EV", // rnDc5t580argo-2
-    "1z8wCtTrmG9Yq_EZBlbw579pvFOX6gro5", // rnDc5t580alt-1
-    "1LgwfSo3cgXFOTpBhPuBaozWfsj0IvSL0", // rnDc5t580alt-2
+    regular(
+      [
+        "1VQb5S_JfIgayElkTjihAfwx6WYS7ChYa", // rnDc5t580-1
+        "1ZRLvf0smPOnJpymCOUlPyWmrvwj0bwjZ", // rnDc5t580-2
+      ],
+      deA5(35, 85),
+    ),
+    {
+      nombre: "Gota",
+      images: [
+        "1z8wCtTrmG9Yq_EZBlbw579pvFOX6gro5", // rnDc5t580alt-1
+        "1LgwfSo3cgXFOTpBhPuBaozWfsj0IvSL0", // rnDc5t580alt-2
+      ],
+      medidas: deA5(70, 85),
+    },
+    {
+      nombre: "Argolla",
+      images: [
+        "1-KYGpRqU7x-dbNXW9wutwgkWj0BAknqV", // rnDc5t580argo-1
+        "1TfKZERInH50C3iVSPH-XagPX0i2iM6EV", // rnDc5t580argo-2
+      ],
+      medidas: [75],
+    },
   ]),
   cierre("Metal Plata Níquel", "fijo-c5", RN_RG_FIJO, [
-    "1F-EEy2p5444OK0M7SI_-6AJxCL8XlqPG",
-    "19jdEPs9OPQVlT97qTDmg3DqSzb24ipWF",
+    regular(["1F-EEy2p5444OK0M7SI_-6AJxCL8XlqPG", "19jdEPs9OPQVlT97qTDmg3DqSzb24ipWF"], [12, 14, 16, 18, 20, 35, 40, 45, 50]),
   ]),
   cierre("Metal Plata Níquel", "fijo-c4", RN_RG_FIJO_C4, [
-    "1sKwPcyI8UFa1eNIwE8ytEDUgIbtn_doR",
-    "1eOBBFK4IvuGLOkBU2kwj0bLijD-i4Erd",
+    regular(["1sKwPcyI8UFa1eNIwE8ytEDUgIbtn_doR", "1eOBBFK4IvuGLOkBU2kwj0bLijD-i4Erd"], [14, 16, 18]),
   ]),
   // Metal Bronce Dorado (RG)
   cierre("Metal Bronce Dorado", "desm-c5", RN_RG_DESM, [
-    "1unq6TOXaJqRTtCyN0qAMFqKy4IWcp0Si",
-    "1giauMbaYFIoO9bPAZ4NTKMmZd8qQYq65",
+    regular(["1unq6TOXaJqRTtCyN0qAMFqKy4IWcp0Si", "1giauMbaYFIoO9bPAZ4NTKMmZd8qQYq65"], [55, 70, 75, 85]),
   ]),
   cierre("Metal Bronce Dorado", "fijo-c5", RN_RG_FIJO, [
-    "1bd-bIh2qQn-N9ImNwVTG2ulnvRuZuhZd",
-    "1Ehz1h9job2h0355fQnR8qNdH5WdkdyL9",
+    regular(["1bd-bIh2qQn-N9ImNwVTG2ulnvRuZuhZd", "1Ehz1h9job2h0355fQnR8qNdH5WdkdyL9"], [16]),
   ]),
+  // Sin stock confirmado: se muestran todas las medidas de la tabla.
   cierre("Metal Bronce Dorado", "fijo-c4", RN_RG_FIJO_C4, [
-    "1Z73bh0jUOfwP1Wp5Lwj3x56T4soARTIe", // rgFc4t580-1
-    "17HZunq6tgqk7ureayemTHq07ou4KD_GM", // rgFc4t580-x6-b
+    regular([
+      "1Z73bh0jUOfwP1Wp5Lwj3x56T4soARTIe", // rgFc4t580-1
+      "17HZunq6tgqk7ureayemTHq07ou4KD_GM", // rgFc4t580-x6-b
+    ]),
   ]),
   // Metal Black Oxide (RGK)
   cierre("Metal Black Oxide", "desm-c5", RGK_DESM, [
-    "1d8oawsH9ATccGY2cC_2kMpa3AaFCYzk2",
-    "1ATpOYRt0f938lMPBGN6-ZNF0R9qiJ6aZ",
+    regular(["1d8oawsH9ATccGY2cC_2kMpa3AaFCYzk2", "1ATpOYRt0f938lMPBGN6-ZNF0R9qiJ6aZ"], deA5(60, 80)),
   ]),
   cierre("Metal Black Oxide", "fijo-c5", RGK_FIJO, [
-    "15H9Eqk8mhymRvfk49eJJldMVRksig1L1",
-    "1T8taLsFZm58xVeOgxVOav4GE3DuMVFpS",
+    regular(["15H9Eqk8mhymRvfk49eJJldMVRksig1L1", "1T8taLsFZm58xVeOgxVOav4GE3DuMVFpS"], [14, 16, 20, 22, 25]),
   ]),
   // Empavonado Bronce (RGKB)
   cierre("Empavonado Bronce", "desm-c5", RGK_DESM, [
-    "1fcxSEJMaKLwjkcVEH1fhtksgX-Mpreu5", // rgthDc5t580-1 (ojo: código RGTH)
-    "1cAzaf9Fb7AhVKgNKJEfIPPEKNrT6T998",
+    regular(
+      [
+        "1fcxSEJMaKLwjkcVEH1fhtksgX-Mpreu5", // rgthDc5t580-1 (ojo: código RGTH)
+        "1cAzaf9Fb7AhVKgNKJEfIPPEKNrT6T998",
+      ],
+      deA5(60, 85),
+    ),
   ]),
   cierre("Empavonado Bronce", "fijo-c5", RGK_FIJO, [
-    "1dns2k6w77i7rl26COPtnpNazmxK3TmBR",
-    "1UUrcirnQP-M0LLGLaG7OJk4BkJuaKKHk",
+    regular(["1dns2k6w77i7rl26COPtnpNazmxK3TmBR", "1UUrcirnQP-M0LLGLaG7OJk4BkJuaKKHk"], [14, 18, 20]),
   ]),
   // Empavonado Níquel (RGTH)
   cierre("Empavonado Níquel", "desm-c5", RGK_DESM, [
-    "1Z0HlpyeIIlCdMMElGHeLv1bmo8AJrhEq",
-    "1XrdSw-pqS6w9OwEweiB3TVOr4Nls6HnY",
+    regular(["1Z0HlpyeIIlCdMMElGHeLv1bmo8AJrhEq", "1XrdSw-pqS6w9OwEweiB3TVOr4Nls6HnY"], deA5(65, 85)),
   ]),
   cierre("Empavonado Níquel", "fijo-c5", RGK_FIJO, [
-    "1AqflnDJz1Et6p0x1hF0VyGP-QfoGRRAh",
-    "1KtKuixxl-dlIimYx-y5wuEqpfdyyvAiV",
+    regular(["1AqflnDJz1Et6p0x1hF0VyGP-QfoGRRAh", "1KtKuixxl-dlIimYx-y5wuEqpfdyyvAiV"], [14, 16, 18, 20, 30]),
   ]),
 ];
 

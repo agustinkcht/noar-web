@@ -44,14 +44,26 @@ export function moneyPlain(n: number) {
   return `$${Math.round(n)}`;
 }
 
+/**
+ * Unidades que cuentan para el escalón de precio: misma medida del mismo producto,
+ * sumando todos los deslizadores (el precio no cambia según el deslizador).
+ */
+export function tierQty(lines: { slug: string; variant: number; qty: number }[], slug: string, variant: number) {
+  return lines.filter((l) => l.slug === slug && l.variant === variant).reduce((n, l) => n + l.qty, 0);
+}
+
 /** Nombre del ítem tal como va en el pedido. */
-export function lineName(product: Product, variantIndex: number) {
+export function lineName(product: Product, variantIndex: number, desl = 0) {
   const v = product.variants[variantIndex];
-  if (product.category === "cierres") return `${product.name} - ${v.label.replace(" ", "")}`;
+  if (product.category === "cierres") {
+    const d = product.deslizadores && product.deslizadores.length > 1 ? product.deslizadores[desl] : undefined;
+    const extra = d ? ` (deslizador ${d.nombre.toLowerCase()})` : "";
+    return `${product.name}${extra} - ${v.label.replace(" ", "")}`;
+  }
   if (product.variants.length > 1) return `${product.name} - ${v.label}`;
   return product.name;
 }
 
-export function variantImages(product: Product, variantIndex: number) {
-  return product.variants[variantIndex]?.images ?? product.images;
+export function variantImages(product: Product, variantIndex: number, desl = 0) {
+  return product.deslizadores?.[desl]?.images ?? product.variants[variantIndex]?.images ?? product.images;
 }

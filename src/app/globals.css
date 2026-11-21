@@ -622,6 +622,36 @@ p {
   margin-bottom: 10px;
   padding: 0;
 }
+.choice-static {
+  font-size: 0.95rem;
+}
+.segmented {
+  display: inline-flex;
+  align-self: flex-start;
+  max-width: 100%;
+  padding: 3px;
+  gap: 3px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+}
+.segmented button {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  border-radius: 999px;
+  padding: 7px 16px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.segmented button:hover {
+  color: var(--fg);
+}
+.segmented button[aria-pressed="true"] {
+  background: var(--fg);
+  color: var(--bg);
+}
 .choice .chip {
   font-family: var(--font-mono);
   min-width: 48px;
@@ -633,6 +663,12 @@ p {
   overflow: hidden;
 }
 .tier-row {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  font: inherit;
+  color: inherit;
   display: grid;
   grid-template-columns: 64px 1fr auto;
   align-items: center;
@@ -643,6 +679,16 @@ p {
 }
 .tier-row:first-child {
   border-top: 0;
+}
+button.tier-row {
+  cursor: pointer;
+  transition: background 0.15s;
+}
+button.tier-row:hover {
+  background: var(--surface);
+}
+button.tier-row:focus-visible {
+  outline-offset: -2px;
 }
 .tier-row[data-active="true"] {
   background: var(--surface-2);

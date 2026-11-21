@@ -87,8 +87,46 @@ async function place(img, w, h, s, left, top, bg) {
     .toBuffer();
 }
 
+/**
+ * Saca `cut` px de la franja blanca más ancha entre las dos mitades del cierre.
+ * Devuelve la foto nueva (PNG) o null si no encuentra una franja con lugar.
+ */
+async function closeGap(img, w, h, box, cut) {
+  const { data } = await img.clone().greyscale().raw().toBuffer({ resolveWithObject: true });
+  const y0 = Math.round(box.y0);
+  const y1 = Math.round(box.y1);
+  const blank = (x) => {
+    for (let y = y0; y < y1; y += 2) if (data[y * w + x] < 225) return false;
+    return true;
+  };
+  let best = null;
+  let start = -1;
+  for (let x = Math.round(box.x0); x <= Math.round(box.x1); x++) {
+    if (blank(x)) {
+      if (start < 0) start = x;
+    } else if (start >= 0) {
+      if (!best || x - start > best.len) best = { start, len: x - start };
+      start = -1;
+    }
+  }
+  const margin = Math.round(w * 0.02); // dejar algo de aire entre las mitades
+  if (!best || best.len - 2 * margin < cut) return null;
+  const from = best.start + Math.round((best.len - cut) / 2);
+  const base = await img.clone().png().toBuffer();
+  const left = await sharp(base).extract({ left: 0, top: 0, width: from, height: h }).toBuffer();
+  const right = await sharp(base).extract({ left: from + cut, top: 0, width: w - from - cut, height: h }).toBuffer();
+  return sharp({ create: { width: w - cut, height: h, channels: 3, background: "#ffffff" } })
+    .composite([
+      { input: left, left: 0, top: 0 },
+      { input: right, left: from, top: 0 },
+    ])
+    .png()
+    .toBuffer();
+}
+
 async function processPhoto(file, mode) {
-  const img = sharp(await fs.readFile(file)).rotate().flatten({ background: "#ffffff" });
+  const input = typeof file === "string" ? await fs.readFile(file) : file;
+  const img = sharp(input).rotate().flatten({ background: "#ffffff" });
   const { width: w0, height: h0 } = await img.clone().png().toBuffer({ resolveWithObject: true }).then((r) => r.info);
   const w = w0;
   const h = h0;
@@ -100,6 +138,13 @@ async function processPhoto(file, mode) {
 
   if (mode === "desm") {
     const gap = CANVAS * DESM_TOP;
+    // Si las dos mitades están muy separadas (producto más ancho que alto), se achica
+    // el blanco del medio para que el producto llegue abajo sin salirse de los costados.
+    const maxRatio = (CANVAS * DESM_WIDTH) / (CANVAS - gap);
+    if (bw / bh > maxRatio) {
+      const narrowed = await closeGap(img, w, h, box, Math.ceil(bw - bh * maxRatio));
+      if (narrowed) return processPhoto(narrowed, mode);
+    }
     let s = (CANVAS * DESM_WIDTH) / bw;
     if (bh * s < CANVAS - gap) s = (CANVAS - gap) / bh; // producto bajo: que igual llegue abajo
     return place(img, w, h, s, Math.round(CANVAS / 2 - cx * s), Math.round(gap - box.y0 * s), bg);
