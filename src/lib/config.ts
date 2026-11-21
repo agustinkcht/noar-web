@@ -1,3 +1,5 @@
+import fotosLocales from "@/data/fotos.json";
+
 /**
  * Configuración general del sitio. Lo que más vas a tocar está acá.
  */
@@ -15,14 +17,27 @@ export const SITE = {
 };
 
 /**
- * De dónde salen las fotos.
- * - "drive": se muestran directo desde Google Drive (la carpeta tiene que estar
- *   compartida como "Cualquier persona con el vínculo puede ver").
- * - "local": se leen de /public/fotos/<ID>.jpg (más rápido; ver README).
+ * Fotos: scripts/fotos.mjs las procesa en cada build y las deja en /public/fotos
+ * (WebP de 480 y 1200 px). Si alguna no se pudo procesar, se muestra desde Drive.
  */
-const IMAGE_SOURCE: "drive" | "local" = "drive";
+const LOCAL = new Set<string>(fotosLocales as string[]);
 
-export function imageUrl(id: string, width = 1000) {
-  if (IMAGE_SOURCE === "local") return `/fotos/${id}.jpg`;
-  return `https://drive.google.com/thumbnail?id=${id}&sz=w${width}`;
+const drive = (id: string, w: number) => `https://drive.google.com/thumbnail?id=${id}&sz=w${w}`;
+
+export function imageSources(id: string) {
+  if (LOCAL.has(id)) {
+    return {
+      src: `/fotos/${id}-1200.webp`,
+      srcSet: `/fotos/${id}-480.webp 480w, /fotos/${id}-1200.webp 1200w`,
+    };
+  }
+  return { src: drive(id, 1200), srcSet: `${drive(id, 480)} 480w, ${drive(id, 1200)} 1200w` };
+}
+
+/** Precarga la foto grande para que el detalle abra sin esperar. */
+export function preloadImage(id?: string) {
+  if (!id || typeof window === "undefined") return;
+  const img = new Image();
+  img.decoding = "async";
+  img.src = imageSources(id).src;
 }

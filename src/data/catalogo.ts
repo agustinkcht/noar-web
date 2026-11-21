@@ -45,9 +45,21 @@ export type Product = {
 
 export const CATEGORIES: { id: CategoryId; name: string; blurb: string }[] = [
   { id: "cierres", name: "Cierres YKK", blurb: "8 familias · desmontables y fijos" },
-  { id: "hilo-elastico", name: "Hilo elástico", blurb: "Corona · blanco y negro" },
-  { id: "hilo-poliester", name: "Hilo poliéster", blurb: "Cucito · cofre surtido" },
   { id: "yute", name: "Hilo de yute", blurb: "Corona · bobinas, cono y rollos" },
+  { id: "hilo-poliester", name: "Hilo poliéster", blurb: "Cucito · cofre surtido" },
+  { id: "hilo-elastico", name: "Hilo elástico", blurb: "Corona · blanco y negro" },
+];
+
+/** Orden en que se muestran las familias de cierres (2 filas de 4). */
+const ORDEN_FAMILIAS = [
+  "Poliéster Reforzado",
+  "Vislon Diente de Perro",
+  "Aluminio",
+  "Metal Black Oxide",
+  "Metal Plata Níquel",
+  "Empavonado Níquel",
+  "Metal Bronce Dorado",
+  "Empavonado Bronce",
 ];
 
 /* ---------- Tiers ---------- */
@@ -389,7 +401,26 @@ const HILOS: Product[] = [
   },
 ];
 
-export const PRODUCTS: Product[] = [...CIERRES, ...HILOS];
+/* ---------- Familias ---------- */
+
+export type Familia = { name: string; slug: string; products: Product[] };
+
+export const FAMILIAS: Familia[] = ORDEN_FAMILIAS.map((name) => ({
+  name,
+  slug: slugify(name),
+  // Desmontable primero: su foto es la de la familia.
+  products: CIERRES.filter((p) => p.family === name),
+}));
+
+export function getFamilia(slug: string) {
+  return FAMILIAS.find((f) => f.slug === slug);
+}
+
+export function familySlug(name: string) {
+  return slugify(name);
+}
+
+export const PRODUCTS: Product[] = [...FAMILIAS.flatMap((f) => f.products), ...HILOS];
 
 export function getProduct(slug: string) {
   return PRODUCTS.find((p) => p.slug === slug);
@@ -397,15 +428,4 @@ export function getProduct(slug: string) {
 
 export function productsByCategory(id: CategoryId) {
   return PRODUCTS.filter((p) => p.category === id);
-}
-
-/** Familias de cierres en orden, con sus formatos. */
-export function cierresPorFamilia() {
-  const map = new Map<string, Product[]>();
-  for (const p of CIERRES) {
-    const list = map.get(p.family!) ?? [];
-    list.push(p);
-    map.set(p.family!, list);
-  }
-  return [...map.entries()].map(([family, products]) => ({ family, products }));
 }

@@ -36,9 +36,14 @@ Para el dominio `noire.ar`, se configura desde el panel del hosting.
 
 ## Fotos
 
-Por ahora se muestran directo desde la carpeta de Drive "NOAR - Catálogo Web". Cada producto guarda el ID del archivo de Drive. Para que se vean, la carpeta tiene que estar compartida como **"Cualquier persona con el vínculo" → Lector**.
+Las fotos salen de la carpeta de Drive "NOAR - Catálogo Web", que tiene que estar compartida como **"Cualquier persona con el vínculo" → Lector**. Cada producto guarda el ID del archivo de Drive en `src/data/catalogo.ts`.
 
-Más adelante conviene servirlas desde el propio sitio (cargan más rápido y no dependen de Drive):
+Antes de cada build corre `scripts/fotos.mjs`, que:
 
-1. Bajá cada foto a `public/fotos/<ID de Drive>.jpg`.
-2. En `src/lib/config.ts`, cambiá `IMAGE_SOURCE` a `"local"`.
+1. Baja cada foto de Drive.
+2. Si tiene fondo blanco, recorta el blanco sobrante y centra el producto en un cuadrado blanco con aire alrededor. Si tiene otro fondo (fotos de ambiente), la recorta al cuadrado.
+3. La guarda comprimida en WebP (480 y 1200 px) en `public/fotos/`.
+
+Las fotos procesadas quedan en caché entre builds, así que solo se bajan las nuevas. En el log de Vercel aparece una línea `fotos: N/M listas`. Si alguna foto no se pudo procesar, el sitio la muestra desde Drive (más lenta, pero se ve).
+
+Para regenerar todas, por ejemplo después de cambiar el encuadre, cambiá `VERSION` en `scripts/fotos.mjs`.

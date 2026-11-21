@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { CATEGORIES, type Product } from "@/data/catalogo";
+import { CATEGORIES, familySlug, type Product } from "@/data/catalogo";
+import { preloadImage } from "@/lib/config";
 import { money, tierIndex, unitPrice, variantImages } from "@/lib/precios";
 import { useCart } from "./CartProvider";
 import { ProductImage } from "./ProductImage";
@@ -24,6 +25,12 @@ export function ProductDetail({ product }: { product: Product }) {
 
   useEffect(() => setPhoto(0), [variant]);
 
+  // Precarga todas las fotos del producto para que la galería pase sin esperas.
+  useEffect(() => {
+    const all = new Set([...product.images, ...product.variants.flatMap((x) => x.images ?? [])]);
+    all.forEach((id) => preloadImage(id));
+  }, [product]);
+
   function onAdd() {
     if (qty < 1) return;
     add(product.slug, variant, qty);
@@ -40,7 +47,7 @@ export function ProductDetail({ product }: { product: Product }) {
             id={images[photo]}
             alt={`${product.name}, foto ${photo + 1}`}
             fallback={product.title}
-            width={1400}
+            sizes="(min-width: 860px) 600px, 100vw"
             priority
           />
           {images.length > 1 && (
@@ -75,7 +82,7 @@ export function ProductDetail({ product }: { product: Product }) {
                 onClick={() => setPhoto(i)}
                 aria-label={`Ver foto ${i + 1}`}
               >
-                <ProductImage id={id} alt="" fallback={String(i + 1)} width={240} />
+                <ProductImage id={id} alt="" fallback={String(i + 1)} sizes="72px" />
               </button>
             ))}
           </div>
@@ -84,7 +91,13 @@ export function ProductDetail({ product }: { product: Product }) {
 
       <div className="detail-info">
         <p className="eyebrow">
-          <Link href={`/catalogo/#${category.id}`}>{category.name}</Link>
+          {product.family ? (
+            <Link href={`/catalogo/cierres/${familySlug(product.family)}/`}>
+              {category.name} · {product.family}
+            </Link>
+          ) : (
+            <Link href={`/catalogo/#${category.id}`}>{category.name}</Link>
+          )}
         </p>
         <h1 className="detail-title">{product.name}</h1>
         <p className="muted">{product.subtitle}</p>

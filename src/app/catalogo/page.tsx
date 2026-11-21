@@ -1,15 +1,14 @@
 import type { Metadata } from "next";
+import { FamilyCard } from "@/components/FamilyCard";
 import { ProductCard } from "@/components/ProductCard";
-import { CATEGORIES, cierresPorFamilia, productsByCategory } from "@/data/catalogo";
+import { CATEGORIES, FAMILIAS, productsByCategory } from "@/data/catalogo";
 
 export const metadata: Metadata = {
   title: "Catálogo",
-  description: "Cierres YKK, hilo elástico, hilo poliéster y yute. Precios mayoristas por cantidad.",
+  description: "Cierres YKK, hilo de yute, hilo poliéster e hilo elástico. Precios mayoristas por cantidad.",
 };
 
 export default function Catalogo() {
-  const familias = cierresPorFamilia();
-
   return (
     <div className="wrap page">
       <header className="page-head">
@@ -25,16 +24,11 @@ export default function Catalogo() {
 
       <section id="cierres" className="cat-section">
         <h2 className="section-title">Cierres YKK</h2>
-        {familias.map(({ family, products }) => (
-          <div key={family} className="family">
-            <h3 className="family-title">{family}</h3>
-            <div className="grid">
-              {products.map((p) => (
-                <ProductCard key={p.slug} product={p} />
-              ))}
-            </div>
-          </div>
-        ))}
+        <div className="grid">
+          {FAMILIAS.map((f) => (
+            <FamilyCard key={f.slug} familia={f} />
+          ))}
+        </div>
       </section>
 
       {CATEGORIES.filter((c) => c.id !== "cierres").map((c) => (

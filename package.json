@@ -3,14 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "predev": "node scripts/fotos.mjs",
     "dev": "next dev",
+    "prebuild": "node scripts/fotos.mjs",
     "build": "next build",
     "start": "npx serve out"
   },
   "dependencies": {
     "next": "15.5.29",
     "react": "19.1.1",
-    "react-dom": "19.1.1"
+    "react-dom": "19.1.1",
+    "sharp": "0.34.3"
   },
   "devDependencies": {
     "@types/node": "22.18.6",

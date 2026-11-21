@@ -10,6 +10,7 @@
   --brass: #c9b48a;
   --brass-ink: #17140e;
   --warn: #e0a37a;
+  --photo: #ffffff; /* fondo de las fotos de producto */
 
   --font-display: "Bodoni Moda", "Didot", "Bodoni 72", Georgia, serif;
   --font-body: "Inter Tight", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -322,16 +323,16 @@ p {
   gap: 12px;
 }
 .cat-img {
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 1;
   border-radius: var(--radius);
   overflow: hidden;
-  background: var(--surface);
+  background: var(--photo);
 }
 .cat-img img,
 .cat-img .img-fallback {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   transition: transform 0.4s ease;
 }
 .cat-tile:hover .cat-img img {
@@ -417,10 +418,10 @@ p {
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 18px;
 }
-@media (max-width: 520px) {
+@media (max-width: 900px) {
   .grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 12px;
@@ -441,14 +442,14 @@ p {
 }
 .card-img {
   aspect-ratio: 1;
-  background: var(--bg);
+  background: var(--photo);
   overflow: hidden;
 }
 .card-img img,
 .card-img .img-fallback {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   transition: transform 0.4s ease;
 }
 .card:hover .card-img img {
@@ -526,14 +527,17 @@ p {
   aspect-ratio: 1;
   border-radius: var(--radius);
   overflow: hidden;
-  background: var(--surface);
+  background: var(--photo);
   border: 1px solid var(--line);
 }
 .gallery-main img,
 .gallery-main .img-fallback {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+}
+.page-head .eyebrow + .page-title {
+  margin-top: -6px;
 }
 .gallery-arrow {
   position: absolute;
@@ -566,7 +570,7 @@ p {
   border: 1px solid var(--line);
   border-radius: 4px;
   overflow: hidden;
-  background: var(--surface);
+  background: var(--photo);
   cursor: pointer;
   opacity: 0.6;
 }
@@ -578,7 +582,7 @@ p {
 .thumb .img-fallback {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   font-size: 0.8rem;
   padding: 0;
 }
@@ -918,13 +922,13 @@ html:has(.toolbar) {
   height: 64px;
   border-radius: 4px;
   overflow: hidden;
-  background: var(--surface);
+  background: var(--photo);
 }
 .line-img img,
 .line-img .img-fallback {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   font-size: 0.7rem;
   padding: 4px;
 }

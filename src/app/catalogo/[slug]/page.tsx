@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ProductDetail } from "@/components/ProductDetail";
-import { PRODUCTS, getProduct } from "@/data/catalogo";
+import { CATEGORIES, PRODUCTS, familySlug, getProduct } from "@/data/catalogo";
 import { minPrice, money } from "@/lib/precios";
 
 type Params = { slug: string };
@@ -26,10 +26,14 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
   const product = getProduct(slug);
   if (!product) notFound();
 
+  const back = product.family
+    ? { href: `/catalogo/cierres/${familySlug(product.family)}/`, label: product.family }
+    : { href: `/catalogo/#${product.category}`, label: CATEGORIES.find((c) => c.id === product.category)!.name };
+
   return (
     <div className="wrap page">
-      <Link href="/catalogo/" className="back">
-        ‹ Catálogo
+      <Link href={back.href} className="back">
+        ‹ {back.label}
       </Link>
       <ProductDetail product={product} />
     </div>

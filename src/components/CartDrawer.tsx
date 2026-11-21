@@ -78,7 +78,7 @@ export function CartDrawer() {
                         id={variantImages(p, l.variant)[0]}
                         alt={p.name}
                         fallback={p.title}
-                        width={200}
+                        sizes="64px"
                       />
                     </Link>
                     <div className="line-body">
