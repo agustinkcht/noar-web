@@ -38,7 +38,7 @@ export default async function FamiliaPage({ params }: { params: Promise<Params> 
       </header>
       <div className="grid">
         {f.products.map((p) => (
-          <ProductCard key={p.slug} product={p} />
+          <ProductCard key={p.slug} product={p} priority />
         ))}
       </div>
     </div>

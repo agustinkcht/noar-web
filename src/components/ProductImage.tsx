@@ -33,7 +33,7 @@ export function ProductImage({ id, alt, fallback, sizes = "(min-width: 900px) 28
     );
   }
 
-  const { src, srcSet } = imageSources(id);
+  const { src, srcSet, lqip } = imageSources(id);
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
@@ -41,6 +41,8 @@ export function ProductImage({ id, alt, fallback, sizes = "(min-width: 900px) 28
       src={src}
       srcSet={srcSet}
       sizes={sizes}
+      // La vista previa queda de fondo: se ve al instante y la foto la tapa al llegar.
+      style={lqip ? { backgroundImage: `url(${lqip})`, backgroundSize: "cover" } : undefined}
       alt={alt}
       className={className}
       loading={priority ? "eager" : "lazy"}

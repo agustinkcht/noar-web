@@ -6,7 +6,7 @@ import { preloadImage } from "@/lib/config";
 import { minPrice, money } from "@/lib/precios";
 import { ProductImage } from "./ProductImage";
 
-export function ProductCard({ product }: { product: Product }) {
+export function ProductCard({ product, priority }: { product: Product; priority?: boolean }) {
   const first = product.variants[0].label;
   const last = product.variants[product.variants.length - 1].label;
   const rango =
@@ -20,7 +20,7 @@ export function ProductCard({ product }: { product: Product }) {
       onTouchStart={() => preloadImage(product.images[0])}
     >
       <div className="card-img">
-        <ProductImage id={product.images[0]} alt={product.name} fallback={product.title} />
+        <ProductImage id={product.images[0]} alt={product.name} fallback={product.title} priority={priority} />
       </div>
       <div className="card-body">
         <p className="card-sub">{product.category === "cierres" ? product.subtitle : product.title}</p>

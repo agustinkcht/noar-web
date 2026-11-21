@@ -26,7 +26,7 @@ export default function Catalogo() {
         <h2 className="section-title">Cierres YKK</h2>
         <div className="grid">
           {FAMILIAS.map((f) => (
-            <FamilyCard key={f.slug} familia={f} />
+            <FamilyCard key={f.slug} familia={f} priority />
           ))}
         </div>
       </section>

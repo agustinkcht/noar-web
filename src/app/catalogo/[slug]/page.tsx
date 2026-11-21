@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { preload } from "react-dom";
 import { ProductDetail } from "@/components/ProductDetail";
 import { CATEGORIES, PRODUCTS, familySlug, getProduct } from "@/data/catalogo";
+import { imageSources } from "@/lib/config";
 import { minPrice, money } from "@/lib/precios";
 
 type Params = { slug: string };
@@ -25,6 +27,13 @@ export default async function ProductPage({ params }: { params: Promise<Params> 
   const { slug } = await params;
   const product = getProduct(slug);
   if (!product) notFound();
+
+  // Anuncia la foto principal en el <head> para que se pida antes que todo lo demás.
+  const main = product.variants[0].images?.[0] ?? product.images[0];
+  if (main) {
+    const { src, srcSet } = imageSources(main);
+    preload(src, { as: "image", imageSrcSet: srcSet, imageSizes: "(min-width: 860px) 600px, 100vw", fetchPriority: "high" });
+  }
 
   const back = product.family
     ? { href: `/catalogo/cierres/${familySlug(product.family)}/`, label: product.family }

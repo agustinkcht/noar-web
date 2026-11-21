@@ -36,7 +36,7 @@ Para el dominio `noire.ar`, se configura desde el panel del hosting.
 
 ## Fotos
 
-Las fotos ya procesadas están en `public/fotos/` (WebP de 480 y 1200 px, de 25 a 150 KB cada una) y se sirven desde el propio sitio. La lista de las que están listas queda en `src/data/fotos.json`; si falta alguna, el sitio la muestra desde Drive.
+Las fotos ya procesadas están en `public/fotos/` (WebP de 480, 800 y 1200 px, de 25 a 150 KB cada una) y se sirven desde el propio sitio. `src/data/fotos.json` guarda, para cada foto, una huella de su contenido (para el caché) y una vista previa mínima que se ve mientras carga. Si falta alguna, el sitio la muestra desde Drive.
 
 Cada producto guarda el ID de Drive de sus fotos en `src/data/catalogo.ts`, y la foto procesada lleva ese mismo ID.
 

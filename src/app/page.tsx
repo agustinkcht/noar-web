@@ -31,7 +31,7 @@ export default function Home() {
         {CATEGORIES.map((c) => (
           <Link key={c.id} href={`/catalogo/#${c.id}`} className="cat-tile">
             <div className="cat-img">
-              <ProductImage id={covers[c.id]} alt={c.name} fallback={c.name} sizes="(min-width: 900px) 280px, 50vw" />
+              <ProductImage id={covers[c.id]} alt={c.name} fallback={c.name} sizes="(min-width: 900px) 280px, 50vw" priority />
             </div>
             <div className="cat-text">
               <h2>{c.name}</h2>

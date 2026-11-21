@@ -12,16 +12,18 @@
  *  - "yute": rollos de yute. El producto ocupa siempre la misma proporción del cuadro.
  *  - "pad":  la foto entera centrada en el cuadrado (fijos, fotos de costado, hilos).
  *
- * Genera /public/fotos/<ID>-480.webp y <ID>-1200.webp, y src/data/fotos.json con
- * la lista de fotos listas. Las fotos que no estén en la lista se ven desde Drive.
+ * Genera /public/fotos/<ID>-480.webp, -800 y -1200, y src/data/fotos.json con, para
+ * cada foto lista, una huella de su contenido (para el caché) y una vista previa
+ * mínima que se muestra mientras carga. Las que no estén en la lista se ven desde Drive.
  */
 import fs from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
+import { createHash } from "node:crypto";
 import sharp from "sharp";
 
 const CANVAS = 1200;
-const SIZES = [480, 1200];
+const SIZES = [480, 800, 1200];
 
 /** Desmontables: aire arriba y ancho máximo que ocupa el producto. */
 const DESM_TOP = 0.05;
@@ -122,7 +124,8 @@ async function main() {
     process.exit(1);
   }
   await fs.mkdir(OUT, { recursive: true });
-  const listas = new Set(existsSync(MANIFEST) ? JSON.parse(await fs.readFile(MANIFEST, "utf8")) : []);
+  const prev = existsSync(MANIFEST) ? JSON.parse(await fs.readFile(MANIFEST, "utf8")) : {};
+  const listas = Array.isArray(prev) ? {} : prev;
   let hechas = 0;
   const faltan = [];
 
@@ -133,18 +136,23 @@ async function main() {
       continue;
     }
     const square = await processPhoto(path.join(srcDir, `${id}.${ext}`), mode);
+    const hash = createHash("sha1");
     for (const size of SIZES) {
-      await sharp(square)
+      const data = await sharp(square)
         .resize(size, size)
         .webp({ quality: size > 600 ? 80 : 76, effort: 6 })
-        .toFile(path.join(OUT, `${id}-${size}.webp`));
+        .toBuffer();
+      hash.update(data);
+      await fs.writeFile(path.join(OUT, `${id}-${size}.webp`), data);
     }
-    listas.add(id);
+    const tiny = await sharp(square).resize(24, 24).webp({ quality: 50 }).toBuffer();
+    listas[id] = { v: hash.digest("hex").slice(0, 8), lqip: `data:image/webp;base64,${tiny.toString("base64")}` };
     hechas++;
   }
 
-  await fs.writeFile(MANIFEST, JSON.stringify([...listas].sort()) + "\n");
-  console.log(`fotos: ${hechas} procesadas, ${listas.size} listas en total`);
+  const ordenado = Object.fromEntries(Object.entries(listas).sort(([a], [b]) => a.localeCompare(b)));
+  await fs.writeFile(MANIFEST, JSON.stringify(ordenado, null, 1) + "\n");
+  console.log(`fotos: ${hechas} procesadas, ${Object.keys(listas).length} listas en total`);
   if (faltan.length) console.log(`fotos: ${faltan.length} sin original en la carpeta: ${faltan.join(", ")}`);
 }
 
