@@ -736,6 +736,74 @@ p {
   min-width: 48px;
 }
 
+/* Selector de color con miniaturas (hilos encerados) */
+.legend-value {
+  margin-left: 10px;
+  color: var(--fg);
+  letter-spacing: 0.02em;
+  text-transform: none;
+  font-size: 0.9rem;
+}
+.swatches {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(76px, 1fr));
+  gap: 10px;
+}
+.swatch {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  text-align: center;
+  min-width: 0;
+}
+.swatch-img {
+  display: block;
+  aspect-ratio: 1;
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--photo);
+  border: 1px solid var(--line);
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+/* Se acerca a la bobina para que el color se lea en chico. */
+.swatch-img img,
+.swatch-img .img-fallback {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.45);
+}
+.swatch-name {
+  font-size: 0.72rem;
+  line-height: 1.25;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+.swatch:hover .swatch-img {
+  border-color: var(--muted);
+}
+.swatch:hover .swatch-name {
+  color: var(--fg);
+}
+.swatch[aria-pressed="true"] .swatch-img {
+  border-color: var(--fg);
+  box-shadow: 0 0 0 1px var(--fg);
+}
+.swatch[aria-pressed="true"] .swatch-name {
+  color: var(--fg);
+}
+.swatch:focus-visible {
+  outline: none;
+}
+.swatch:focus-visible .swatch-img {
+  outline: 2px solid var(--brass);
+  outline-offset: 2px;
+}
+
 .tiers {
   border: 1px solid var(--line);
   border-radius: var(--radius);

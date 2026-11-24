@@ -36,14 +36,18 @@ export function ProductDetail({ product }: { product: Product }) {
   }
 
   // Precarga todas las fotos del producto para que la galería pase sin esperas.
+  // Con muchas variantes (ej. 36 colores) no se precarga todo: cada foto se pide
+  // al pasar por su miniatura.
   useEffect(() => {
     const all = new Set([
       ...product.images,
       ...product.variants.flatMap((x) => x.images ?? []),
       ...(product.deslizadores ?? []).flatMap((d) => d.images),
     ]);
-    all.forEach((id) => preloadImage(id));
+    if (all.size <= 8) all.forEach((id) => preloadImage(id));
   }, [product]);
+
+  const isColor = product.variantName === "Color";
 
   function onAdd() {
     if (qty < 1) return;
@@ -135,7 +139,33 @@ export function ProductDetail({ product }: { product: Product }) {
 
         {product.variants.length > 1 && (
           <fieldset className="choice">
-            <legend>{product.variantName}</legend>
+            <legend>
+              {product.variantName}
+              {isColor && <span className="legend-value">{v.label}</span>}
+            </legend>
+            {isColor ? (
+              <div className="swatches">
+                {medidas.map((i) => {
+                  const vv = product.variants[i];
+                  const img = vv.images?.[0];
+                  return (
+                    <button
+                      key={vv.label}
+                      type="button"
+                      className="swatch"
+                      aria-pressed={i === variant}
+                      onClick={() => setVariant(i)}
+                      onPointerEnter={() => preloadImage(img)}
+                    >
+                      <span className="swatch-img">
+                        <ProductImage id={img} alt="" fallback="" sizes="72px" />
+                      </span>
+                      <span className="swatch-name">{vv.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            ) : (
             <div className="chips">
               {medidas.map((i) => {
                 const vv = product.variants[i];
@@ -152,6 +182,7 @@ export function ProductDetail({ product }: { product: Product }) {
                 );
               })}
             </div>
+            )}
             {product.category === "cierres" && <p className="muted small">Medidas en centímetros.</p>}
           </fieldset>
         )}

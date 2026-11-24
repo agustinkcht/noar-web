@@ -10,6 +10,7 @@
  *  - "desm": desmontables. Mismo aire arriba en todos, el producto ocupa el ancho
  *            y sigue hasta el borde de abajo.
  *  - "yute": rollos de yute. El producto ocupa siempre la misma proporción del cuadro.
+ *  - "bobina": bobinas de hilo encerado. Igual que "yute", con más aire alrededor.
  *  - "pad":  la foto entera centrada en el cuadrado (fijos, fotos de costado, hilos).
  *
  * Genera /public/fotos/<ID>-480.webp, -800 y -1200, y src/data/fotos.json con, para
@@ -30,6 +31,8 @@ const DESM_TOP = 0.05;
 const DESM_WIDTH = 0.92;
 /** Yute: proporción del cuadro que ocupa el rollo (lado mayor). */
 const YUTE_FILL = 0.88;
+/** Bobinas de encerado: alto de la bobina sobre el cuadro (referencia: Obispo y Rosa Chicle). */
+const BOBINA_FILL = 0.66;
 
 const ROOT = process.cwd();
 const OUT = path.join(ROOT, "public", "fotos");
@@ -149,8 +152,8 @@ async function processPhoto(file, mode) {
     if (bh * s < CANVAS - gap) s = (CANVAS - gap) / bh; // producto bajo: que igual llegue abajo
     return place(img, w, h, s, Math.round(CANVAS / 2 - cx * s), Math.round(gap - box.y0 * s), bg);
   }
-  if (mode === "yute") {
-    const s = (CANVAS * YUTE_FILL) / Math.max(bw, bh);
+  if (mode === "yute" || mode === "bobina") {
+    const s = (CANVAS * (mode === "yute" ? YUTE_FILL : BOBINA_FILL)) / Math.max(bw, bh);
     return place(img, w, h, s, Math.round(CANVAS / 2 - cx * s), Math.round(CANVAS / 2 - cy * s), bg);
   }
   // Fotos de ambiente (fondo que no es blanco): recortadas al cuadrado, sin franjas.
