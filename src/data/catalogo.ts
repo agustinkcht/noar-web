@@ -1,5 +1,5 @@
 /**
- * Catálogo NOIRE.
+ * Catálogo NOAR.
  *
  * Precios de cierres: planilla "NOIRE Precios IA 09/26" (hoja Lista IA).
  * Precios de hilos: planilla "NOIRE · Precios Hilos (Corona, Yute, Encerados)" (hoja Precios NOIRE).
@@ -8,7 +8,7 @@
  * Para actualizar un precio, cambiá el número en la tabla que corresponda.
  */
 
-export type CategoryId = "cierres" | "hilo-elastico" | "hilo-poliester" | "yute";
+export type CategoryId = "cierres" | "yute" | "hilo-poliester" | "hilo-elastico" | "hilo-encerado";
 
 export type Tier = {
   key: string;
@@ -43,16 +43,64 @@ export type Product = {
   images: string[];
   /** Solo cierres: tipos de deslizador, cada uno con sus fotos y sus medidas (índices de `variants`). */
   deslizadores?: Deslizador[];
+  /**
+   * El escalón de precio cuenta todas las variantes juntas (ej. hilos encerados:
+   * 12 bobinas de colores distintos llegan al x12). Si no, cuenta por variante.
+   */
+  tierPorProducto?: boolean;
 };
 
 export type Deslizador = { nombre: string; images: string[]; variants: number[] };
 
-export const CATEGORIES: { id: CategoryId; name: string; blurb: string }[] = [
-  { id: "cierres", name: "Cierres YKK", blurb: "8 familias · desmontables y fijos" },
-  { id: "yute", name: "Hilo de yute", blurb: "Corona · bobinas, cono y rollos" },
-  { id: "hilo-poliester", name: "Hilo poliéster", blurb: "Cucito · cofre surtido" },
-  { id: "hilo-elastico", name: "Hilo elástico", blurb: "Corona · blanco y negro" },
+export type Category = {
+  id: CategoryId;
+  name: string;
+  blurb: string;
+  /** Foto de la tarjeta de categoría (ID de Drive). */
+  cover: string;
+};
+
+export const CATEGORIES: Category[] = [
+  {
+    id: "cierres",
+    name: "Cierres YKK",
+    blurb: "Desmontables y fijos · cadena 4 y 5",
+    cover: "1VQb5S_JfIgayElkTjihAfwx6WYS7ChYa", // Metal Plata Níquel desmontable
+  },
+  {
+    id: "yute",
+    name: "Hilo de yute",
+    blurb: "Corona · bobinas, cono y rollos",
+    cover: "1TrPfH8wC7PAsVWCuM_Eu9A5ztgKvT7TL", // 28/4
+  },
+  {
+    id: "hilo-poliester",
+    name: "Hilo poliéster",
+    blurb: "Cucito · cofre surtido",
+    cover: "1QejRpxLMMfCzYhTuJ6cPzD3ZMHADu5r0",
+  },
+  {
+    id: "hilo-elastico",
+    name: "Hilo elástico",
+    blurb: "Corona · blanco y negro",
+    cover: "1JqYnXIIFAEwynLFCeLJWACnubWhAzx18",
+  },
+  {
+    id: "hilo-encerado",
+    name: "Hilo encerado",
+    blurb: "Corona · común, fluo y matizado",
+    cover: "13ngOyNbPS2n3gT3DirpcJMEpvShqSM7Q", // Matizado Argentina
+  },
 ];
+
+export function getCategory(id: string) {
+  return CATEGORIES.find((c) => c.id === id);
+}
+
+/** Página de cada categoría. */
+export function categoryHref(id: CategoryId) {
+  return id === "cierres" ? "/catalogo/cierres/" : `/catalogo/${id}/`;
+}
 
 /** Orden en que se muestran las familias de cierres (2 filas de 4). */
 const ORDEN_FAMILIAS = [
@@ -459,6 +507,124 @@ const HILOS: Product[] = [
   },
 ];
 
+/* ---------- Hilos encerados ---------- */
+
+const TIERS_ENCERADO: Tier[] = [
+  { key: "x1", label: "x1", min: 1, rango: "1 a 11 u." },
+  { key: "x12", label: "x12", min: 12, rango: "12 u. o más, combinando colores" },
+];
+
+/** [color, ID de la foto en Drive] */
+type Color = [string, string];
+
+function encerado(
+  linea: string,
+  slug: string,
+  blurb: string,
+  colores: Color[],
+  precios: (number | null)[],
+  cover: string,
+): Product {
+  return {
+    slug,
+    category: "hilo-encerado",
+    name: `Hilo encerado Corona ${linea.toLowerCase()} 70 m`,
+    title: `Encerado ${linea.toLowerCase()}`,
+    subtitle: blurb,
+    unit: "c/u",
+    variantName: "Color",
+    tiers: TIERS_ENCERADO,
+    tierPorProducto: true,
+    variants: colores.map(([label, id]) => ({ label, prices: precios, images: [id] })),
+    images: [cover],
+  };
+}
+
+const ENCERADOS: Product[] = [
+  encerado(
+    "Común",
+    "hilo-encerado-comun",
+    `Bobina de 70 m · 36 colores`,
+    [
+      ["Blanco", "180jp1k4a_63sR3MBVVRDcopKbB2I-KLC"],
+      ["Beige", "15WFF3edjCi-P5iVYYm496lWCXSeod47q"],
+      ["Amarillo Patito", "1Z9ApXxkPOAbyMbr0t3riMLN_Fyal3KI2"],
+      ["Amarillo Limón", "19grBouDtfj4kLMSUaV0JVgq0ulid9e48"],
+      ["Amarillo Oro", "1mkAfviauySRzmnuRdzCOOqsa2j40pI-A"],
+      ["Mostaza", "1vVXKxDmu_PbR92_KTwa4EX8AYvJubKXI"],
+      ["Naranja", "1ZnWmXPz1MtpK0XbN4TA4WQgK145kgnz_"],
+      ["Dulce de Leche", "1IJqMC373ZRnk_QV454LoYIVZ-iyDhoNh"],
+      ["Cobre", "1YH1pJvKwoVw1nf9AM-4EW5Qi5-A2es5f"],
+      ["Habano", "1i_8ta6er1GF_M4T2u-EczP2Fd6PDzY26"],
+      ["Marrón Africano", "10ACHdZdvYrX6LQkPTrSP1YqoE6oEc--R"],
+      ["Rojo", "1Q2d9F2r69FDc_y_ysE2lkAOFZ2lzJPg8"],
+      ["Bordó", "1PeiVv2yoQDxirKZpK523ErEXKmzFCu9E"],
+      ["Rosa Bebé", "1PwSV8zjSDZQ7tc2BdQ97PgGe1lRADkJK"],
+      ["Rosa Chicle", "1YHTY-8F7C6vBQ6wFfRVDD2c4Y_ASxjoB"],
+      ["Rosa Salmón", "1ooO1QLvDDnTfsUqNwM1Ephig6oCgV2EJ"],
+      ["Fucsia", "1DImd25aq5dP0rlyEW2beMiP87gzs9SFa"],
+      ["Lila", "1Zm2roKfW9NjGafiKR3RpGnrzq1ZH3yDc"],
+      ["Violeta", "1Y7ecSJx4Rq0-nb1TOlRtZ4t3WWrlWra-"],
+      ["Obispo", "15uKQIXDMybOpM3sSPhttk-4z52RZHbFN"],
+      ["Celeste Claro", "1ymZ4NEoXQdmL8XvCM_lv5qJ2lC41lFfj"],
+      ["Celeste Bandera", "1oHbkWdNiEFICrggneZ1x-0c8lJMKIDG_"],
+      ["Turquesa", "18gwtnizylyIFEZXiGKGmyIufdQaKDPrS"],
+      ["Azul Francia", "1eoFTezFd2Iiu-SVSX6aOSiaYCDlitbw9"],
+      ["Azul Jean", "1x4ljG_0yH9R0gyWyw_cdPoR48n26cNDF"],
+      ["Azul Marino", "1yGirRa1W4bq6siZ8kR_PsPGxq6Hroofd"],
+      ["Verde Agua", "1pwURB8ckpLXI93M1ztB2z0LpA4fIKE2B"],
+      ["Verde Manzana", "1GXDTa_2XxEgma4O23Ic5R-6syFTqDoDs"],
+      ["Verde Césped", "1Y9n5Gkfd24gEkG8yqaFvv47xqSVs3JJp"],
+      ["Verde Benetón", "17Ebzpdjfkrs4j6SsDDAvH4ITKJEypalV"],
+      ["Verde Aceituna", "1F3BlE9nr06MswMr7iU41TTZ8vE4yJWny"],
+      ["Verde Musgo", "1ese1gzJuymw1jfENP9Tfyxh55F4Se_5X"],
+      ["Verde Oscuro", "1nbixDABtEVzqcBavC1lMI6W8EVj-7oiT"],
+      ["Gris Claro", "1H4QrVJzI_6W1Hg-_gpW-K-VBNoNwKI3A"],
+      ["Gris Oscuro", "1t4Lcz3YU8KDYiGWHhCCv0CMqHduQoGCf"],
+      ["Negro", "1mUpkKSiPbwsfVzE7GLsOH-MKjMfAmakG"],
+    ],
+    // Planilla: x1 $1.200; el x12 ($20.160 el pack = $1.680 c/u) queda afuera hasta revisarlo.
+    [1200, null],
+    "1DImd25aq5dP0rlyEW2beMiP87gzs9SFa", // Fucsia
+  ),
+  encerado(
+    "Fluo",
+    "hilo-encerado-fluo",
+    `Bobina de 70 m · 4 colores`,
+    [
+      ["Amarillo", "1UY8ci5k3lgOZywh2TL53-YgJT01y9wUM"],
+      ["Naranja", "1AgYbJN6tPtvSOFIcjT5EjzQt-_WoLhyO"],
+      ["Rosa", "1OmN2HivYQJIS_TNbOYRsEK8LMeixH9qJ"],
+      ["Verde", "18zl5JqoKw4FKdlBwVCTDQlNEZFwexV8Z"],
+    ],
+    // Planilla: x1 $1.680; x12 $17.280 el pack = $1.440 c/u.
+    [1680, 1440],
+    "1UY8ci5k3lgOZywh2TL53-YgJT01y9wUM", // Amarillo
+  ),
+  encerado(
+    "Matizado",
+    "hilo-encerado-matizado",
+    `Bobina de 70 m · 12 combinaciones`,
+    [
+      ["Argentina", "13ngOyNbPS2n3gT3DirpcJMEpvShqSM7Q"],
+      ["Boca", "1Qr4LNsXbvq0po5I9lzJ_To98qvn5fPDr"],
+      ["River", "1m6TfV-lAuaz8I8NVEiVg2plhYK_E6z7l"],
+      ["Jamaica", "1FcVBiKAySxqCeYf6BPDFBDeAKGoGpSum"],
+      ["Cebra", "1iblOWrJSAK2BPFkAr0NkJbaJLR9leDl_"],
+      ["Trifluo 1 (Amarillo, Rojo, Naranja)", "1RnmF8xzr9VyNuQHstiPMu9DM-9KMurZ7"],
+      ["Trifluo 2 (Rosa, Lila, Violeta)", "1HMpddkoWZu6b178m-5E1_aV5TMi3sbRQ"],
+      ["Rosa", "184FJH6Br_TRpacqO8-0rR9oC_tjTUfOl"],
+      ["Lila", "1KsqqNNQzqVhkPe8h8H2dcdo1awVx6FFD"],
+      ["Obispo", "1LVvR19lU5fGbp-lj5ynd1SV33rX-l-Aw"],
+      ["Verde", "1aHWRVTKHMZWhrhDFmVgLNHE2tsdLU5cC"],
+      ["Marrón", "1KdzSW93KUP4_jQEtQxtNpTJDPNu3gDcT"],
+    ],
+    // Planilla: mismo renglón que el común ("común / tricolor / multi").
+    [1200, null],
+    "13ngOyNbPS2n3gT3DirpcJMEpvShqSM7Q", // Argentina
+  ),
+];
+
 /* ---------- Familias ---------- */
 
 export type Familia = { name: string; slug: string; products: Product[] };
@@ -478,7 +644,7 @@ export function familySlug(name: string) {
   return slugify(name);
 }
 
-export const PRODUCTS: Product[] = [...FAMILIAS.flatMap((f) => f.products), ...HILOS];
+export const PRODUCTS: Product[] = [...FAMILIAS.flatMap((f) => f.products), ...HILOS, ...ENCERADOS];
 
 export function getProduct(slug: string) {
   return PRODUCTS.find((p) => p.slug === slug);

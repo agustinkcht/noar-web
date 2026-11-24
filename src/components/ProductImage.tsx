@@ -42,7 +42,11 @@ export function ProductImage({ id, alt, fallback, sizes = "(min-width: 900px) 28
       srcSet={srcSet}
       sizes={sizes}
       // La vista previa queda de fondo: se ve al instante y la foto la tapa al llegar.
-      style={lqip ? { backgroundImage: `url(${lqip})`, backgroundSize: "cover" } : undefined}
+      style={
+        lqip
+          ? { backgroundImage: `url(${lqip})`, backgroundSize: "contain", backgroundPosition: "center", backgroundRepeat: "no-repeat" }
+          : undefined
+      }
       alt={alt}
       className={className}
       loading={priority ? "eager" : "lazy"}

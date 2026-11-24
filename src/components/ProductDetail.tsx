@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { CATEGORIES, familySlug, type Product } from "@/data/catalogo";
+import { CATEGORIES, categoryHref, familySlug, type Product } from "@/data/catalogo";
 import { preloadImage } from "@/lib/config";
 import { money, tierIndex, unitPrice, variantImages } from "@/lib/precios";
 import { useCart } from "./CartProvider";
@@ -110,7 +110,7 @@ export function ProductDetail({ product }: { product: Product }) {
               {category.name} · {product.family}
             </Link>
           ) : (
-            <Link href={`/catalogo/#${category.id}`}>{category.name}</Link>
+            <Link href={categoryHref(category.id)}>{category.name}</Link>
           )}
         </p>
         <h1 className="detail-title">{product.name}</h1>

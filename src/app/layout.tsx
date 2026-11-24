@@ -8,14 +8,14 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
-  title: { default: "NOIRE · Mercería mayorista", template: "%s · NOIRE" },
+  title: { default: "NOAR · Mercería mayorista", template: "%s · NOAR" },
   description:
-    "Cierres YKK, hilo elástico, hilo poliéster y yute a precio mayorista. Catálogo y lista de precios.",
+    "Cierres YKK, hilo de yute, hilo poliéster, hilo elástico e hilo encerado a precio mayorista. Catálogo y lista de precios.",
   openGraph: {
-    title: "NOIRE · Mercería mayorista",
+    title: "NOAR · Mercería mayorista",
     description: "Cierres YKK, hilos y avíos para confección a precio mayorista.",
     url: SITE.url,
-    siteName: "NOIRE",
+    siteName: "NOAR",
     locale: "es_AR",
     type: "website",
   },
@@ -41,7 +41,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <main>{children}</main>
           <footer className="site-footer">
             <div className="wrap footer-inner">
-              <span className="wordmark small">NOIRE</span>
+              <span className="wordmark small">NOAR</span>
               <nav className="footer-nav" aria-label="Pie">
                 <Link href="/catalogo/">Catálogo</Link>
                 <Link href="/precios/">Lista de precios</Link>
@@ -51,7 +51,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   </a>
                 )}
               </nav>
-              <span className="muted small">Mercería mayorista · Buenos Aires</span>
+              <span className="muted small">Mercería mayorista · Proveedor de avíos · Buenos Aires</span>
             </div>
           </footer>
           <CartDrawer />

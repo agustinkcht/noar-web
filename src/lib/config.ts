@@ -4,8 +4,8 @@ import fotosLocales from "@/data/fotos.json";
  * Configuración general del sitio. Lo que más vas a tocar está acá.
  */
 export const SITE = {
-  name: "NOIRE",
-  tagline: "Mercería mayorista",
+  name: "NOAR",
+  tagline: "Mercería mayorista · Proveedor de avíos",
   url: "https://noar.ar",
   /**
    * Número de WhatsApp al que llegan los pedidos, en formato internacional

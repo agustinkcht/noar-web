@@ -1,12 +1,12 @@
-# NOIRE · sitio web
+# NOAR · sitio web
 
-Landing, catálogo y lista de precios de NOIRE. Está hecho en Next.js 15 (App Router, TypeScript) y se exporta como sitio estático.
+Landing, catálogo y lista de precios de NOAR. Está hecho en Next.js 15 (App Router, TypeScript) y se exporta como sitio estático.
 
 ## Páginas
 
 | Ruta | Qué es |
 |---|---|
-| `/` | Landing: NOIRE · Mercería mayorista, con accesos al catálogo y a la lista de precios |
+| `/` | Landing: NOAR · Mercería mayorista · Proveedor de avíos, con accesos al catálogo y a la lista de precios |
 | `/catalogo/` | Todos los productos por categoría (`/catalogo/#cierres`, `#hilo-elastico`, `#hilo-poliester`, `#yute`) |
 | `/catalogo/<producto>/` | Detalle: fotos, medida o presentación, precio según cantidad y botón para agregar al pedido |
 | `/precios/` | Lista de precios con buscador. Cada producto tiene su ancla, por ejemplo `/precios/#cierre-aluminio-fijo-c5` |

@@ -295,6 +295,21 @@ p {
   padding-left: 0.42em;
 }
 
+.tag-sep {
+  margin-inline: 0.6em 0.2em;
+}
+@media (max-width: 560px) {
+  .tag-sep {
+    display: none;
+  }
+  .tag-part {
+    display: block;
+  }
+  .tag-part + .tag-sep + .tag-part {
+    margin-top: 6px;
+  }
+}
+
 .hero-ctas {
   display: flex;
   flex-wrap: wrap;
@@ -307,7 +322,7 @@ p {
 
 .home-cats {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 16px;
   padding-block: 48px 72px;
 }
@@ -399,6 +414,111 @@ p {
 }
 
 /* ---------- Catalog ---------- */
+
+.page-note {
+  max-width: 62ch;
+  color: var(--muted);
+  border-left: 2px solid var(--brass);
+  padding-left: 14px;
+}
+
+.cat-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+@media (max-width: 700px) {
+  .cat-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+}
+
+.cat-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--surface);
+  transition: border-color 0.2s;
+}
+.cat-card:hover {
+  border-color: var(--muted);
+}
+.cat-card-img {
+  aspect-ratio: 16 / 10;
+  background: var(--photo);
+  overflow: hidden;
+}
+.cat-card-img img,
+.cat-card-img .img-fallback {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: transform 0.4s ease;
+}
+.cat-card:hover .cat-card-img img {
+  transform: scale(1.03);
+}
+.cat-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 20px 22px 22px;
+  flex: 1;
+}
+.cat-card-title {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(1.5rem, 3vw, 1.9rem);
+  line-height: 1.1;
+}
+.cat-card-foot {
+  margin-top: auto;
+  padding-top: 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+.cat-card-count {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.cat-card-cta {
+  font-size: 0.9rem;
+  color: var(--brass);
+}
+
+/* La primera categoría (cierres) ocupa todo el ancho, con la foto al costado. */
+.cat-card.featured {
+  grid-column: 1 / -1;
+  flex-direction: row;
+}
+.cat-card.featured .cat-card-img {
+  flex: 0 0 50%;
+  aspect-ratio: 16 / 10;
+}
+.cat-card.featured .cat-card-body {
+  justify-content: center;
+  padding: clamp(22px, 4vw, 48px);
+}
+.cat-card.featured .cat-card-title {
+  font-size: clamp(1.9rem, 4vw, 2.8rem);
+}
+.cat-card.featured .cat-card-foot {
+  margin-top: 18px;
+}
+@media (max-width: 700px) {
+  .cat-card.featured {
+    flex-direction: column;
+  }
+  .cat-card.featured .cat-card-img {
+    flex-basis: auto;
+  }
+}
 
 .cat-section {
   margin-bottom: 64px;
@@ -1080,5 +1200,154 @@ html:has(.toolbar) {
 @media (prefers-reduced-motion: reduce) {
   * {
     transition: none !important;
+  }
+}
+
+/* ---------- Cómo comprar ---------- */
+
+.howto {
+  padding-block: clamp(48px, 8vw, 88px);
+  border-bottom: 1px solid var(--line);
+}
+.howto-head {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 36px;
+}
+.howto-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.9rem, 4.5vw, 2.8rem);
+  line-height: 1.1;
+}
+.howto ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.howto-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+.howto-body h3 {
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+.howto-body p {
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+.howto-link {
+  margin-top: 4px;
+  font-size: 0.9rem;
+  color: var(--brass);
+}
+.howto-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Opción A: tarjetas */
+.howto-cards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+.howto-cards .howto-item {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding: 24px 22px 26px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+.howto-cards .howto-num {
+  font-family: var(--font-display);
+  font-size: 2.6rem;
+  line-height: 1;
+  color: var(--brass);
+}
+@media (max-width: 900px) {
+  .howto-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 560px) {
+  .howto-cards {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+  .howto-cards .howto-item {
+    flex-direction: row;
+    gap: 18px;
+    padding: 18px;
+  }
+  .howto-cards .howto-num {
+    font-size: 2rem;
+    flex: 0 0 2.6rem;
+  }
+}
+
+/* Opción B: pasos sobre una línea */
+.howto-steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 24px;
+  position: relative;
+}
+.howto-steps .howto-item {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  position: relative;
+}
+.howto-steps .howto-num {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  border: 1px solid var(--brass);
+  color: var(--brass);
+  background: var(--bg);
+  position: relative;
+  z-index: 1;
+}
+/* la línea que une los pasos */
+.howto-steps .howto-item:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 20px;
+  left: 48px;
+  right: -16px;
+  height: 1px;
+  background: var(--line);
+}
+@media (max-width: 760px) {
+  .howto-steps {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+  .howto-steps .howto-item {
+    flex-direction: row;
+    gap: 18px;
+    padding-bottom: 28px;
+  }
+  .howto-steps .howto-num {
+    flex: 0 0 40px;
+  }
+  .howto-steps .howto-item:not(:last-child)::after {
+    top: 48px;
+    bottom: 6px;
+    left: 20px;
+    right: auto;
+    width: 1px;
+    height: auto;
   }
 }

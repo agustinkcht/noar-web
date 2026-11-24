@@ -58,6 +58,11 @@ export function PriceList() {
             {c.id === "yute" && (
               <p className="muted small tier-legend">x12 = desde 12 unidades del mismo producto.</p>
             )}
+            {c.id === "hilo-encerado" && (
+              <p className="muted small tier-legend">
+                Precio por bobina de 70 m. x12 = desde 12 bobinas de la misma línea, combinando colores.
+              </p>
+            )}
             <div className="price-grid">
               {items.map((p) => (
                 <PriceTable key={p.slug} product={p} />
@@ -74,6 +79,15 @@ export function PriceList() {
 
 function PriceTable({ product }: { product: Product }) {
   const isCierre = product.category === "cierres";
+  // Si todas las variantes valen lo mismo (ej. colores), una sola fila alcanza.
+  const key = (p: (number | null)[]) => p.join("|");
+  const sameForAll =
+    product.variants.length > 3 && product.variants.every((v) => key(v.prices) === key(product.variants[0].prices));
+  const rows = sameForAll
+    ? [{ label: `Todos los ${product.variantName === "Color" ? "colores" : "tipos"} (${product.variants.length})`, prices: product.variants[0].prices }]
+    : product.variants;
+  // Columnas sin ningún precio cargado (ej. x12 pendiente) no se muestran.
+  const cols = product.tiers.map((_, i) => i).filter((i) => rows.some((r) => r.prices[i] != null));
   return (
     <div className="price-block" id={product.slug}>
       <div className="price-head">
@@ -89,19 +103,19 @@ function PriceTable({ product }: { product: Product }) {
           <thead>
             <tr>
               <th scope="col">{isCierre ? "cm" : product.variantName}</th>
-              {product.tiers.map((t) => (
-                <th key={t.key} scope="col">
-                  {t.label}
+              {cols.map((i) => (
+                <th key={product.tiers[i].key} scope="col">
+                  {product.tiers[i].label}
                 </th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {product.variants.map((v) => (
+            {rows.map((v) => (
               <tr key={v.label}>
                 <th scope="row">{isCierre ? v.label.replace(" cm", "") : v.label}</th>
-                {v.prices.map((pr, i) => (
-                  <td key={i}>{pr == null ? "—" : amount(pr)}</td>
+                {cols.map((i) => (
+                  <td key={i}>{v.prices[i] == null ? "—" : amount(v.prices[i]!)}</td>
                 ))}
               </tr>
             ))}

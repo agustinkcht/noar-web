@@ -16,8 +16,8 @@ export function Header() {
   return (
     <header className="site-header">
       <div className="wrap header-inner">
-        <Link href="/" className="wordmark" aria-label="NOIRE, inicio">
-          NOIRE
+        <Link href="/" className="wordmark" aria-label="NOAR, inicio">
+          NOAR
         </Link>
         <nav className="nav" aria-label="Principal">
           {NAV.map((n) => (

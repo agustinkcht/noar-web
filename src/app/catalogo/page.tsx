@@ -1,46 +1,36 @@
 import type { Metadata } from "next";
-import { FamilyCard } from "@/components/FamilyCard";
-import { ProductCard } from "@/components/ProductCard";
-import { CATEGORIES, FAMILIAS, productsByCategory } from "@/data/catalogo";
+import { CategoryCard } from "@/components/CategoryCard";
+import { CATEGORIES, FAMILIAS, productsByCategory, type CategoryId } from "@/data/catalogo";
 
 export const metadata: Metadata = {
   title: "Catálogo",
-  description: "Cierres YKK, hilo de yute, hilo poliéster e hilo elástico. Precios mayoristas por cantidad.",
+  description:
+    "Cierres YKK, hilo de yute, hilo poliéster, hilo elástico e hilo encerado. Precios mayoristas por cantidad.",
 };
+
+/** Lo que se cuenta en cada tarjeta: familias, productos o colores. */
+function countFor(id: CategoryId) {
+  if (id === "cierres") return `${FAMILIAS.length} familias`;
+  const products = productsByCategory(id);
+  if (id === "hilo-encerado") {
+    const colores = products.reduce((n, p) => n + p.variants.length, 0);
+    return `${products.length} líneas · ${colores} colores`;
+  }
+  return products.length === 1 ? "1 producto" : `${products.length} productos`;
+}
 
 export default function Catalogo() {
   return (
     <div className="wrap page">
       <header className="page-head">
         <h1 className="page-title">Catálogo</h1>
-        <nav className="chips" aria-label="Categorías">
-          {CATEGORIES.map((c) => (
-            <a key={c.id} href={`#${c.id}`} className="chip">
-              {c.name}
-            </a>
-          ))}
-        </nav>
+        <p className="muted">Elegí una categoría para ver sus productos.</p>
       </header>
-
-      <section id="cierres" className="cat-section">
-        <h2 className="section-title">Cierres YKK</h2>
-        <div className="grid">
-          {FAMILIAS.map((f) => (
-            <FamilyCard key={f.slug} familia={f} priority />
-          ))}
-        </div>
-      </section>
-
-      {CATEGORIES.filter((c) => c.id !== "cierres").map((c) => (
-        <section key={c.id} id={c.id} className="cat-section">
-          <h2 className="section-title">{c.name}</h2>
-          <div className="grid">
-            {productsByCategory(c.id).map((p) => (
-              <ProductCard key={p.slug} product={p} />
-            ))}
-          </div>
-        </section>
-      ))}
+      <div className="cat-grid">
+        {CATEGORIES.map((c, i) => (
+          <CategoryCard key={c.id} category={c} count={countFor(c.id)} featured={i === 0} />
+        ))}
+      </div>
     </div>
   );
 }

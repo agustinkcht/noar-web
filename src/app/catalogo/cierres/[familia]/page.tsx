@@ -29,7 +29,7 @@ export default async function FamiliaPage({ params }: { params: Promise<Params> 
 
   return (
     <div className="wrap page">
-      <Link href="/catalogo/#cierres" className="back">
+      <Link href="/catalogo/cierres/" className="back">
         ‹ Cierres YKK
       </Link>
       <header className="page-head">

@@ -1,4 +1,4 @@
-import type { Product } from "@/data/catalogo";
+import { getProduct, type Product } from "@/data/catalogo";
 
 /** Índice del tier que aplica para una cantidad (por producto y medida). */
 export function tierIndex(product: Product, variantIndex: number, qty: number) {
@@ -49,7 +49,10 @@ export function moneyPlain(n: number) {
  * sumando todos los deslizadores (el precio no cambia según el deslizador).
  */
 export function tierQty(lines: { slug: string; variant: number; qty: number }[], slug: string, variant: number) {
-  return lines.filter((l) => l.slug === slug && l.variant === variant).reduce((n, l) => n + l.qty, 0);
+  const porProducto = getProduct(slug)?.tierPorProducto;
+  return lines
+    .filter((l) => l.slug === slug && (porProducto || l.variant === variant))
+    .reduce((n, l) => n + l.qty, 0);
 }
 
 /** Nombre del ítem tal como va en el pedido. */
