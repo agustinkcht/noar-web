@@ -31,7 +31,7 @@ Para el dominio `noire.ar`, se configura desde el panel del hosting.
 ## Qué tocar
 
 - **Número de WhatsApp:** `src/lib/config.ts` → `whatsapp` (ej. `"5491112345678"`).
-- **Precios, productos y fotos:** `src/data/catalogo.ts`. Los cierres están en tablas `[medida, x1, x4, x12, x50]`, copiadas de "NOIRE Precios IA 09/26". Los hilos salen de "NOIRE · Precios Hilos".
+- **Precios, productos y fotos:** `src/data/catalogo.ts`. Los cierres están en tablas `[medida, x1, x4, x12, x50]`, copiadas de "NOIRE Precios IA 09/26". Los hilos salen de "NOIRE · Precios Hilos", hoja "Precios Legal 3": x1 (1 a 11 u.) es el mayorista estándar y x12 (12 u. o más) el precio pack.
 - **Envío gratis:** `src/lib/config.ts` → `envioGratisDesde`.
 
 ## Fotos

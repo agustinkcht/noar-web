@@ -2,7 +2,8 @@
  * Catálogo NOAR.
  *
  * Precios de cierres: planilla "NOIRE Precios IA 09/26" (hoja Lista IA).
- * Precios de hilos: planilla "NOIRE · Precios Hilos (Corona, Yute, Encerados)" (hoja Precios NOIRE).
+ * Precios de hilos: planilla "NOIRE · Precios Hilos (Corona, Yute, Encerados)", hoja "Precios Legal 3":
+ *   x1 (1 a 11 u.) = Mayorista estándar · x12 (12 u. o más) = Precio pack.
  * Fotos: carpeta de Drive "NOAR - Catálogo Web" (se guarda el ID de cada archivo).
  *
  * Para actualizar un precio, cambiá el número en la tabla que corresponda.
@@ -123,12 +124,19 @@ const TIERS_CIERRES: Tier[] = [
   { key: "x50", label: "x50", min: 50, rango: "50 u. o más" },
 ];
 
-const TIERS_YUTE: Tier[] = [
+/**
+ * Hilos (planilla "Precios Legal 3"): x1 = mayorista estándar (1 a 11 u.),
+ * x12 = precio pack (12 u. o más).
+ */
+const TIERS_HILOS: Tier[] = [
   { key: "x1", label: "x1", min: 1, rango: "1 a 11 u." },
   { key: "x12", label: "x12", min: 12, rango: "12 u. o más" },
 ];
 
-const TIER_UNICO: Tier[] = [{ key: "u", label: "Precio", min: 1, rango: "Precio único" }];
+const TIERS_HILOS_PACKS: Tier[] = [
+  { key: "x1", label: "x1", min: 1, rango: "1 a 11 packs" },
+  { key: "x12", label: "x12", min: 12, rango: "12 packs o más" },
+];
 
 /* ---------- Tablas de precios de cierres: [medida cm, x1, x4, x12, x50] ---------- */
 
@@ -402,8 +410,8 @@ const HILOS: Product[] = [
     subtitle: "Corona · bobinas de 25 m",
     unit: "pack",
     variantName: "Presentación",
-    tiers: TIER_UNICO,
-    variants: [{ label: "Pack x12 bobinas", prices: [6160] }],
+    tiers: TIERS_HILOS_PACKS,
+    variants: [{ label: "Pack x12 bobinas", prices: [4430, 4060] }],
     images: ["1G-G9ce-JPdD4o4zr5_4NeJIOEod97Mf1", "1Qh99OA0-HvFQZbDAi5YaH9yGn6CBlCiB"],
   },
   {
@@ -414,8 +422,8 @@ const HILOS: Product[] = [
     subtitle: "Corona · bobinas de 25 m",
     unit: "pack",
     variantName: "Presentación",
-    tiers: TIER_UNICO,
-    variants: [{ label: "Pack x12 bobinas", prices: [8260] }],
+    tiers: TIERS_HILOS_PACKS,
+    variants: [{ label: "Pack x12 bobinas", prices: [5950, 5460] }],
     images: ["1JqYnXIIFAEwynLFCeLJWACnubWhAzx18", "1ybq7eGEroAkYl73FX0KFI14HSQIR0G1s"],
   },
   {
@@ -426,8 +434,8 @@ const HILOS: Product[] = [
     subtitle: "Hilo poliéster · 72 bobinas surtidas",
     unit: "c/u",
     variantName: "Presentación",
-    tiers: TIER_UNICO,
-    variants: [{ label: "Cofre x72 bobinas", prices: [48800] }],
+    tiers: TIERS_HILOS,
+    variants: [{ label: "Cofre x72 bobinas", prices: [41990, 38200] }],
     images: ["1QejRpxLMMfCzYhTuJ6cPzD3ZMHADu5r0", "1fPzPF0Op2vD6Yp9cvx3NPOTcU3KtUIBA"],
   },
   {
@@ -438,10 +446,10 @@ const HILOS: Product[] = [
     subtitle: "Corona · bobina de 50 m",
     unit: "c/u",
     variantName: "Presentación",
-    tiers: TIERS_YUTE,
+    tiers: TIERS_HILOS,
     variants: [
-      { label: "Unidad", prices: [2500, null], images: ["1DKFcrjrLGFnNe3m-RkDmgKfrobZs8xHF"] },
-      { label: "Pack x10", prices: [19800, 17640], images: ["1Qg9tHoK82_jrPEIsZvtLx1on35gw3-LK"] },
+      { label: "Unidad", prices: [1560, 1430], images: ["1DKFcrjrLGFnNe3m-RkDmgKfrobZs8xHF"] },
+      { label: "Pack x10", prices: [15620, 14320], images: ["1Qg9tHoK82_jrPEIsZvtLx1on35gw3-LK"] },
     ],
     images: ["1DKFcrjrLGFnNe3m-RkDmgKfrobZs8xHF", "1Qg9tHoK82_jrPEIsZvtLx1on35gw3-LK"],
   },
@@ -453,8 +461,8 @@ const HILOS: Product[] = [
     subtitle: "Corona · cono de 500 m",
     unit: "c/u",
     variantName: "Presentación",
-    tiers: TIERS_YUTE,
-    variants: [{ label: "Cono 500 m", prices: [19800, 17640] }],
+    tiers: TIERS_HILOS,
+    variants: [{ label: "Cono 500 m", prices: [15620, 14320] }],
     images: ["1KQrvGymQPgeo95uBdncJL5igjfwcSCKq"],
   },
   {
@@ -465,8 +473,8 @@ const HILOS: Product[] = [
     subtitle: "Corona · rollo de 50 m",
     unit: "c/u",
     variantName: "Presentación",
-    tiers: TIERS_YUTE,
-    variants: [{ label: "Rollo 50 m", prices: [4920, 4430] }],
+    tiers: TIERS_HILOS,
+    variants: [{ label: "Rollo 50 m", prices: [3870, 3580] }],
     images: ["19buE9nLJY1b6oje2pG_nytCEcd35Sttg"],
   },
   {
@@ -477,8 +485,8 @@ const HILOS: Product[] = [
     subtitle: "Corona · rollo de 50 m",
     unit: "c/u",
     variantName: "Presentación",
-    tiers: TIERS_YUTE,
-    variants: [{ label: "Rollo 50 m", prices: [4920, 4430] }],
+    tiers: TIERS_HILOS,
+    variants: [{ label: "Rollo 50 m", prices: [3870, 3580] }],
     images: ["1ckaNzBhgr9TD3pVDPH6XubxDZ7l5qyDb"],
   },
   {
@@ -489,8 +497,8 @@ const HILOS: Product[] = [
     subtitle: "Corona · rollo de 30 m",
     unit: "c/u",
     variantName: "Presentación",
-    tiers: TIERS_YUTE,
-    variants: [{ label: "Rollo 30 m", prices: [6960, 6260] }],
+    tiers: TIERS_HILOS,
+    variants: [{ label: "Rollo 30 m", prices: [5390, 4960] }],
     images: ["1TrPfH8wC7PAsVWCuM_Eu9A5ztgKvT7TL"],
   },
   {
@@ -501,8 +509,8 @@ const HILOS: Product[] = [
     subtitle: "Corona · rollo de 20 m",
     unit: "c/u",
     variantName: "Presentación",
-    tiers: TIERS_YUTE,
-    variants: [{ label: "Rollo 20 m", prices: [5980, 5380] }],
+    tiers: TIERS_HILOS,
+    variants: [{ label: "Rollo 20 m", prices: [4590, 4190] }],
     images: ["1nk_MimgyA95u7R3Ti_WZj0Zj1DMuhrcZ"],
   },
 ];
@@ -583,8 +591,7 @@ const ENCERADOS: Product[] = [
       ["Gris Oscuro", "1t4Lcz3YU8KDYiGWHhCCv0CMqHduQoGCf"],
       ["Negro", "1mUpkKSiPbwsfVzE7GLsOH-MKjMfAmakG"],
     ],
-    // Planilla: x1 $1.200; el x12 ($20.160 el pack = $1.680 c/u) queda afuera hasta revisarlo.
-    [1200, null],
+    [1280, 1180],
     "1DImd25aq5dP0rlyEW2beMiP87gzs9SFa", // Fucsia
   ),
   encerado(
@@ -597,8 +604,7 @@ const ENCERADOS: Product[] = [
       ["Rosa", "1OmN2HivYQJIS_TNbOYRsEK8LMeixH9qJ"],
       ["Verde", "18zl5JqoKw4FKdlBwVCTDQlNEZFwexV8Z"],
     ],
-    // Planilla: x1 $1.680; x12 $17.280 el pack = $1.440 c/u.
-    [1680, 1440],
+    [1480, 1380],
     "1UY8ci5k3lgOZywh2TL53-YgJT01y9wUM", // Amarillo
   ),
   encerado(
@@ -619,8 +625,7 @@ const ENCERADOS: Product[] = [
       ["Verde", "1aHWRVTKHMZWhrhDFmVgLNHE2tsdLU5cC"],
       ["Marrón", "1KdzSW93KUP4_jQEtQxtNpTJDPNu3gDcT"],
     ],
-    // Planilla: mismo renglón que el común ("común / tricolor / multi").
-    [1200, null],
+    [1580, 1480],
     "13ngOyNbPS2n3gT3DirpcJMEpvShqSM7Q", // Argentina
   ),
 ];
