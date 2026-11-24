@@ -1187,9 +1187,24 @@ html:has(.toolbar) {
   font-weight: 500;
   font-size: 1.3rem;
 }
-.drawer-secondary {
+.drawer-actions {
   display: flex;
-  justify-content: space-between;
+  gap: 10px;
+  margin-top: 4px;
+}
+.btn-send {
+  flex: 1;
+  min-height: 54px;
+  font-size: 1.02rem;
+}
+.btn-clear {
+  min-height: 54px;
+  padding: 0 18px;
+  color: var(--muted);
+}
+.btn-clear.confirm {
+  color: var(--warn);
+  border-color: var(--warn);
 }
 
 /* ---------- Footer ---------- */

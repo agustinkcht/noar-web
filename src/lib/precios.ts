@@ -60,7 +60,7 @@ export function lineName(product: Product, variantIndex: number, desl = 0) {
   const v = product.variants[variantIndex];
   if (product.category === "cierres") {
     const d = product.deslizadores && product.deslizadores.length > 1 ? product.deslizadores[desl] : undefined;
-    const extra = d ? ` (deslizador ${d.nombre.toLowerCase()})` : "";
+    const extra = d ? ` Deslizador ${d.nombre}` : "";
     return `${product.name}${extra} - ${v.label.replace(" ", "")}`;
   }
   if (product.variants.length > 1) return `${product.name} - ${v.label}`;
