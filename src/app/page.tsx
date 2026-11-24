@@ -1,6 +1,5 @@
 import Link from "next/link";
-import { CATEGORIES, categoryHref } from "@/data/catalogo";
-import { ProductImage } from "@/components/ProductImage";
+import { HowTo } from "@/components/HowTo";
 
 export default function Home() {
   return (
@@ -26,19 +25,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="wrap home-cats" aria-label="Categorías">
-        {CATEGORIES.map((c) => (
-          <Link key={c.id} href={categoryHref(c.id)} className="cat-tile">
-            <div className="cat-img">
-              <ProductImage id={c.cover} alt={c.name} fallback={c.name} sizes="(min-width: 900px) 230px, 50vw" priority />
-            </div>
-            <div className="cat-text">
-              <h2>{c.name}</h2>
-              <p className="muted small">{c.blurb}</p>
-            </div>
-          </Link>
-        ))}
-      </section>
+      <HowTo />
     </>
   );
 }

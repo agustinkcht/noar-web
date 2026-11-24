@@ -21,8 +21,8 @@ const STEPS = [
   },
 ];
 
-/** Guía de compra debajo del hero. `variant`: tarjetas o pasos sobre una línea. */
-export function HowTo({ variant = "cards" }: { variant?: "cards" | "steps" }) {
+/** Guía de compra debajo del hero: cuatro pasos unidos por una línea. */
+export function HowTo() {
   return (
     <section className="howto" aria-labelledby="howto-title">
       <div className="wrap">
@@ -32,11 +32,11 @@ export function HowTo({ variant = "cards" }: { variant?: "cards" | "steps" }) {
             Tu pedido en cuatro pasos
           </h2>
         </header>
-        <ol className={variant === "cards" ? "howto-cards" : "howto-steps"}>
+        <ol className="howto-steps">
           {STEPS.map((s, i) => (
             <li key={s.title} className="howto-item">
               <span className="howto-num" aria-hidden="true">
-                {variant === "cards" ? String(i + 1).padStart(2, "0") : i + 1}
+                {i + 1}
               </span>
               <div className="howto-body">
                 <h3>{s.title}</h3>
