@@ -6,7 +6,7 @@ import fotosLocales from "@/data/fotos.json";
 export const SITE = {
   name: "NOIRE",
   tagline: "Mercería mayorista",
-  url: "https://noire.ar",
+  url: "https://noar.ar",
   /**
    * Número de WhatsApp al que llegan los pedidos, en formato internacional
    * sin "+" ni espacios. Ej: "5491112345678".
