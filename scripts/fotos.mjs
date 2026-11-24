@@ -152,6 +152,16 @@ async function processPhoto(file, mode) {
     if (bh * s < CANVAS - gap) s = (CANVAS - gap) / bh; // producto bajo: que igual llegue abajo
     return place(img, w, h, s, Math.round(CANVAS / 2 - cx * s), Math.round(gap - box.y0 * s), bg);
   }
+  // Bobinas con fondo claro pero teñido (ej. celeste): balance de blancos para que el fondo
+  // quede blanco como en el resto, y se vuelve a encuadrar sobre la foto corregida.
+  if (mode === "bobina" && Math.min(bg.r, bg.g, bg.b) < 245 && Math.min(bg.r, bg.g, bg.b) > 200) {
+    const fixed = await img
+      .clone()
+      .linear([255 / bg.r, 255 / bg.g, 255 / bg.b], [0, 0, 0])
+      .png()
+      .toBuffer();
+    return processPhoto(fixed, mode);
+  }
   if (mode === "yute" || mode === "bobina") {
     const s = (CANVAS * (mode === "yute" ? YUTE_FILL : BOBINA_FILL)) / Math.max(bw, bh);
     return place(img, w, h, s, Math.round(CANVAS / 2 - cx * s), Math.round(CANVAS / 2 - cy * s), bg);
