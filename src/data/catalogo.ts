@@ -64,16 +64,16 @@ export type Category = {
 /** Orden de las categorías en el catálogo y la lista de precios (cierres al final). */
 export const CATEGORIES: Category[] = [
   {
+    id: "hilo-encerado",
+    name: "Hilo encerado",
+    blurb: "Corona · común, fluo y matizado",
+    cover: "13ngOyNbPS2n3gT3DirpcJMEpvShqSM7Q", // Matizado Argentina
+  },
+  {
     id: "yute",
     name: "Hilo de yute",
     blurb: "Corona · bobinas, cono y rollos",
     cover: "1TrPfH8wC7PAsVWCuM_Eu9A5ztgKvT7TL", // 28/4
-  },
-  {
-    id: "hilo-poliester",
-    name: "Hilo poliéster",
-    blurb: "Cucito · cofre surtido",
-    cover: "1QejRpxLMMfCzYhTuJ6cPzD3ZMHADu5r0",
   },
   {
     id: "hilo-elastico",
@@ -82,10 +82,10 @@ export const CATEGORIES: Category[] = [
     cover: "1JqYnXIIFAEwynLFCeLJWACnubWhAzx18",
   },
   {
-    id: "hilo-encerado",
-    name: "Hilo encerado",
-    blurb: "Corona · común, fluo y matizado",
-    cover: "13ngOyNbPS2n3gT3DirpcJMEpvShqSM7Q", // Matizado Argentina
+    id: "hilo-poliester",
+    name: "Hilo poliéster",
+    blurb: "Cucito · cofre surtido",
+    cover: "1QejRpxLMMfCzYhTuJ6cPzD3ZMHADu5r0",
   },
   {
     id: "cierres",
