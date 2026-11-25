@@ -61,13 +61,8 @@ export type Category = {
   cover: string;
 };
 
+/** Orden de las categorías en el catálogo y la lista de precios (cierres al final). */
 export const CATEGORIES: Category[] = [
-  {
-    id: "cierres",
-    name: "Cierres YKK",
-    blurb: "Desmontables y fijos · cadena 4 y 5",
-    cover: "1VQb5S_JfIgayElkTjihAfwx6WYS7ChYa", // Metal Plata Níquel desmontable
-  },
   {
     id: "yute",
     name: "Hilo de yute",
@@ -91,6 +86,12 @@ export const CATEGORIES: Category[] = [
     name: "Hilo encerado",
     blurb: "Corona · común, fluo y matizado",
     cover: "13ngOyNbPS2n3gT3DirpcJMEpvShqSM7Q", // Matizado Argentina
+  },
+  {
+    id: "cierres",
+    name: "Cierres YKK",
+    blurb: "Desmontables y fijos · cadena 4 y 5",
+    cover: "1VQb5S_JfIgayElkTjihAfwx6WYS7ChYa", // Metal Plata Níquel desmontable
   },
 ];
 

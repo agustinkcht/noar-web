@@ -27,8 +27,8 @@ export default function Catalogo() {
         <p className="muted">Elegí una categoría para ver sus productos.</p>
       </header>
       <div className="cat-grid">
-        {CATEGORIES.map((c, i) => (
-          <CategoryCard key={c.id} category={c} count={countFor(c.id)} featured={i === 0} />
+        {CATEGORIES.map((c) => (
+          <CategoryCard key={c.id} category={c} count={countFor(c.id)} featured={c.id === "cierres"} />
         ))}
       </div>
     </div>

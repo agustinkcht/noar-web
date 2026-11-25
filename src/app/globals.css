@@ -451,7 +451,7 @@ p {
   color: var(--brass);
 }
 
-/* La primera categoría (cierres) ocupa todo el ancho, con la foto al costado. */
+/* La tarjeta de cierres ocupa todo el ancho, con la foto al costado. */
 .cat-card.featured {
   grid-column: 1 / -1;
   flex-direction: row;
