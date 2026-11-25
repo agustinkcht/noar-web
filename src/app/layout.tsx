@@ -11,10 +11,10 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE.url),
   title: { default: "NOAR · Mercería mayorista", template: "%s · NOAR" },
   description:
-    "Cierres YKK, hilo de yute, hilo poliéster, hilo elástico e hilo encerado a precio mayorista. Catálogo y lista de precios.",
+    "Hilo de yute, hilo poliéster, hilo elástico e hilo encerado a precio mayorista. Catálogo y lista de precios.",
   openGraph: {
     title: "NOAR · Mercería mayorista",
-    description: "Cierres YKK, hilos y avíos para confección a precio mayorista.",
+    description: "Hilos y avíos para confección a precio mayorista.",
     url: SITE.url,
     siteName: "NOAR",
     locale: "es_AR",

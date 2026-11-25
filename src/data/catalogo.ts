@@ -95,6 +95,13 @@ export const CATEGORIES: Category[] = [
   },
 ];
 
+/**
+ * Categorías ocultas por ahora: no aparecen en el catálogo ni en la lista de precios.
+ * Para volver a mostrar una, sacala de esta lista.
+ */
+export const OCULTAS: CategoryId[] = ["cierres"];
+export const VISIBLES = CATEGORIES.filter((c) => !OCULTAS.includes(c.id));
+
 export function getCategory(id: string) {
   return CATEGORIES.find((c) => c.id === id);
 }

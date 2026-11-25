@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { CATEGORIES, PRODUCTS, type Product } from "@/data/catalogo";
+import { VISIBLES, PRODUCTS, type Product } from "@/data/catalogo";
 import { amount } from "@/lib/precios";
 
 function normalize(s: string) {
@@ -25,7 +25,7 @@ export function PriceList() {
     <>
       <div className="toolbar">
         <nav className="chips" aria-label="Categorías">
-          {CATEGORIES.map((c) => (
+          {VISIBLES.map((c) => (
             <a key={c.id} href={`#${c.id}`} className="chip">
               {c.name}
             </a>
@@ -36,14 +36,14 @@ export function PriceList() {
           <input
             id="buscar-precios"
             type="search"
-            placeholder="Buscar: vislon fijo, yute 28/4…"
+            placeholder="Buscar: yute 28/4, encerado fluo…"
             value={q}
             onChange={(e) => setQ(e.target.value)}
           />
         </label>
       </div>
 
-      {CATEGORIES.map((c) => {
+      {VISIBLES.map((c) => {
         const items = filtered.filter((p) => p.category === c.id);
         if (!items.length) return null;
         return (
