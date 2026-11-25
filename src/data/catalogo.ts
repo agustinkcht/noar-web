@@ -531,8 +531,8 @@ const HILOS: Product[] = [
 /* ---------- Hilos encerados ---------- */
 
 const TIERS_ENCERADO: Tier[] = [
-  { key: "x1", label: "x1", min: 1, rango: "1 a 11 u." },
-  { key: "x12", label: "x12", min: 12, rango: "12 u. o más, combinando colores" },
+  { key: "x1", label: "x1", min: 1, rango: "1 a 15 u." },
+  { key: "x16", label: "x16", min: 16, rango: "16 u. o más del mismo color" },
 ];
 
 /** [color, ID de la foto en Drive] */
@@ -554,8 +554,7 @@ function encerado(
     subtitle: blurb,
     unit: "c/u",
     variantName: "Color",
-    tiers: TIERS_ENCERADO,
-    tierPorProducto: true,
+    tiers: TIERS_ENCERADO, // el pack se cuenta por color, no por línea
     variants: colores.map(([label, id]) => ({ label, prices: precios, images: [id] })),
     images: [cover],
   };

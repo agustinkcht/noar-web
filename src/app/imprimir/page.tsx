@@ -23,7 +23,7 @@ const LEGEND: Record<string, string> = {
   yute: "x1 = 1 a 11 u. · x12 = 12 u. o más del mismo producto.",
   "hilo-poliester": "Precio por unidad.",
   "hilo-elastico": "Precio por pack de 12 bobinas. x12 = desde 12 packs.",
-  "hilo-encerado": "Precio por bobina de 70 m. x12 = desde 12 bobinas de la misma línea, combinando colores.",
+  "hilo-encerado": "Precio por bobina de 70 m. x16 = desde 16 bobinas del mismo color.",
   cierres: "Precio por unidad según cantidad, por medida: x1 = 1 a 3 u. · x4 = 4 a 11 u. · x12 = 12 a 49 u. · x50 = 50 u. o más.",
 };
 

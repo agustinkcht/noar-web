@@ -222,7 +222,7 @@ export function ProductDetail({ product }: { product: Product }) {
         </div>
         {available > 1 && (
           <p className="muted small">
-            El precio se calcula por {product.category === "cierres" ? "medida" : "producto"} según la
+            El precio se calcula por {product.category === "cierres" ? "medida" : product.variantName === "Color" ? "color" : "producto"} según la
             cantidad que lleves. Tocá un escalón para cargar esa cantidad.
           </p>
         )}

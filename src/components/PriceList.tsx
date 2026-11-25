@@ -60,7 +60,7 @@ export function PriceList() {
             )}
             {c.id === "hilo-encerado" && (
               <p className="muted small tier-legend">
-                Precio por bobina de 70 m. x12 = desde 12 bobinas de la misma línea, combinando colores.
+                Precio por bobina de 70 m. x16 = desde 16 bobinas del mismo color.
               </p>
             )}
             <div className="price-grid">

@@ -83,8 +83,8 @@ function CategoryPage({ category }: { category: Category }) {
         <h1 className="page-title">{category.name}</h1>
         {category.id === "hilo-encerado" && (
           <p className="page-note">
-            Tres líneas: común, fluo y matizado. Entrá a una para elegir el color. Para el precio por
-            cantidad se suman todos los colores de la misma línea.
+            Tres líneas: común, fluo y matizado. Entrá a una para elegir el color. El precio pack
+            (x16) es a partir de 16 bobinas del mismo color.
           </p>
         )}
       </header>
