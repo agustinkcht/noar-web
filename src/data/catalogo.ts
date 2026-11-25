@@ -469,8 +469,8 @@ const HILOS: Product[] = [
   {
     slug: "yute-6-2-cono",
     category: "yute",
-    name: "Hilo de yute 1mm Corona 6/2 cono 500 m",
-    title: "Yute 1mm 6/2 cono",
+    name: "Hilo de yute 1,5mm Corona 6/2 cono 500 m",
+    title: "Yute 1,5mm 6/2 cono",
     subtitle: "Corona · cono de 500 m",
     unit: "c/u",
     variantName: "Presentación",
