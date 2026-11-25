@@ -5,7 +5,7 @@ import { VISIBLES, FAMILIAS, productsByCategory, type CategoryId } from "@/data/
 export const metadata: Metadata = {
   title: "Catálogo",
   description:
-    "Hilo de yute, hilo poliéster, hilo elástico e hilo encerado. Precios mayoristas por cantidad.",
+    "Cierres YKK, hilo de yute, hilo poliéster, hilo elástico e hilo encerado. Precios mayoristas por cantidad.",
 };
 
 /** Lo que se cuenta en cada tarjeta: familias, productos o colores. */

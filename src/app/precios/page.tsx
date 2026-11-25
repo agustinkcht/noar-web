@@ -3,7 +3,7 @@ import { PriceList } from "@/components/PriceList";
 
 export const metadata: Metadata = {
   title: "Lista de precios",
-  description: "Lista de precios mayorista de NOAR: hilos de yute, poliéster, elástico y encerado.",
+  description: "Lista de precios mayorista de NOAR: cierres YKK por medida y cantidad, hilos de yute, poliéster, elástico y encerado.",
 };
 
 export default function Precios() {

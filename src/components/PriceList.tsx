@@ -36,7 +36,7 @@ export function PriceList() {
           <input
             id="buscar-precios"
             type="search"
-            placeholder="Buscar: yute 28/4, encerado fluo…"
+            placeholder="Buscar: vislon fijo, yute 28/4…"
             value={q}
             onChange={(e) => setQ(e.target.value)}
           />
