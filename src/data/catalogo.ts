@@ -604,7 +604,7 @@ const ENCERADOS: Product[] = [
       ["Negro", "1mUpkKSiPbwsfVzE7GLsOH-MKjMfAmakG"],
     ],
     [1280, 1180],
-    "1DImd25aq5dP0rlyEW2beMiP87gzs9SFa", // Fucsia
+    "1i_8ta6er1GF_M4T2u-EczP2Fd6PDzY26", // Habano
   ),
   encerado(
     "Fluo",
