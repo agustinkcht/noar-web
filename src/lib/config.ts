@@ -39,6 +39,12 @@ export function imageSources(id: string) {
   return { src: drive(id, 1200), srcSet: `${drive(id, 480)} 480w, ${drive(id, 1200)} 1200w`, lqip: undefined };
 }
 
+/** Foto chica (480 px), para listados e impresión. */
+export function thumbSrc(id: string) {
+  const f = LOCAL[id];
+  return f ? `/fotos/${id}-480.webp?v=${f.v}` : drive(id, 480);
+}
+
 /** Precarga la foto grande para que el detalle abra sin esperar. */
 export function preloadImage(id?: string) {
   if (!id || typeof window === "undefined") return;

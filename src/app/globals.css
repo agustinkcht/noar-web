@@ -1350,3 +1350,239 @@ html:has(.toolbar) {
     height: auto;
   }
 }
+
+/* ---------- Versión para imprimir / PDF (/imprimir) ----------
+   Fondo claro a propósito: se imprime y se lee bien en el celular. */
+.pdf-doc {
+  --p-ink: #141414;
+  --p-muted: #6b6760;
+  --p-line: #dedad3;
+  --p-soft: #f4f1ec;
+  --p-brass: #9a7d45;
+  background: #ffffff;
+  color: var(--p-ink);
+  font-family: var(--font-body);
+  font-size: 11px;
+  line-height: 1.45;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.pdf-muted {
+  color: var(--p-muted);
+}
+.pdf-cover {
+  min-height: 260mm;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 14px;
+  padding: 0 14mm;
+  break-after: page;
+}
+.pdf-mark {
+  font-family: var(--font-display);
+  font-size: 76px;
+  letter-spacing: 0.2em;
+  line-height: 1;
+}
+.pdf-tag {
+  font-size: 11px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--p-brass);
+}
+.pdf-cover-title {
+  margin-top: 28px;
+  font-family: var(--font-display);
+  font-size: 34px;
+}
+.pdf-steps {
+  margin: 18px 0 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 14px;
+}
+.pdf-site {
+  margin-top: 24px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+.pdf-section {
+  padding: 0 4mm;
+  margin-top: 18px;
+}
+/* Las secciones largas arrancan en página nueva; los hilos chicos van seguidos. */
+.pdf-section.pdf-newpage {
+  margin-top: 0;
+  break-before: page;
+}
+.pdf-h2 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 26px;
+  border-bottom: 1px solid var(--p-ink);
+  padding-bottom: 6px;
+}
+.pdf-legend {
+  margin: 8px 0 16px;
+  color: var(--p-muted);
+}
+.pdf-h3 {
+  font-size: 14px;
+  font-weight: 600;
+}
+.pdf-items {
+  display: flex;
+  flex-direction: column;
+}
+.pdf-item {
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--p-line);
+  break-inside: avoid;
+}
+.pdf-item-img {
+  width: 54px;
+  height: 54px;
+  object-fit: contain;
+  border: 1px solid var(--p-line);
+  border-radius: 3px;
+}
+.pdf-item-name {
+  font-weight: 600;
+  font-size: 12px;
+}
+.pdf-mini,
+.pdf-table {
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+.pdf-mini th,
+.pdf-mini td {
+  padding: 2px 0 2px 18px;
+  text-align: right;
+  white-space: nowrap;
+}
+.pdf-mini th,
+.pdf-table thead th {
+  color: var(--p-muted);
+  font-weight: 500;
+  font-size: 10px;
+}
+.pdf-block {
+  padding: 12px 0 18px;
+  border-bottom: 1px solid var(--p-line);
+}
+.pdf-block-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+  margin-bottom: 10px;
+  break-after: avoid;
+}
+.pdf-inline-prices {
+  display: flex;
+  gap: 16px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  white-space: nowrap;
+}
+.pdf-inline-prices b {
+  color: var(--p-brass);
+  font-weight: 500;
+  margin-right: 4px;
+}
+.pdf-swatches {
+  display: grid;
+  grid-template-columns: repeat(9, minmax(0, 1fr));
+  gap: 8px 6px;
+}
+.pdf-swatch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  text-align: center;
+  font-size: 8.5px;
+  line-height: 1.2;
+  break-inside: avoid;
+}
+.pdf-swatch-img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  transform: scale(1.35);
+  clip-path: inset(13% round 3px);
+  margin: -6% 0;
+}
+.pdf-family {
+  padding: 12px 0 16px;
+  border-bottom: 1px solid var(--p-line);
+  break-inside: avoid;
+}
+.pdf-family-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.pdf-family-img {
+  width: 54px;
+  height: 54px;
+  object-fit: contain;
+  border: 1px solid var(--p-line);
+  border-radius: 3px;
+}
+.pdf-formatos {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+.pdf-formato-name {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.pdf-desl {
+  font-size: 9.5px;
+  margin-bottom: 4px;
+}
+.pdf-table {
+  width: 100%;
+  font-size: 10px;
+}
+.pdf-table th,
+.pdf-table td {
+  padding: 2px 4px;
+  text-align: right;
+  border-bottom: 1px solid var(--p-soft);
+}
+.pdf-table tbody th {
+  text-align: left;
+  color: var(--p-muted);
+  font-weight: 400;
+}
+.pdf-table thead th:first-child {
+  text-align: left;
+}
+
+@page {
+  size: A4;
+  margin: 12mm 10mm;
+}
+@media print {
+  .site-header,
+  .site-footer,
+  .drawer-root {
+    display: none !important;
+  }
+  body {
+    background: #ffffff;
+  }
+}
