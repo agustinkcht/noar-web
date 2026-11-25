@@ -22,7 +22,7 @@ type CartCtx = {
 };
 
 const Ctx = createContext<CartCtx | null>(null);
-const KEY = "noire-pedido-v2"; // v2: medidas filtradas por stock y deslizador
+const KEY = "noire-pedido-v3"; // v3: yute 6/2 bobina solo en pack x10
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [lines, setLines] = useState<CartLine[]>([]);

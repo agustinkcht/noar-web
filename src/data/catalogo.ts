@@ -133,6 +133,9 @@ const TIERS_HILOS: Tier[] = [
   { key: "x12", label: "x12", min: 12, rango: "12 u. o más" },
 ];
 
+/** Un solo precio, sin escalones (ej. cofre Cucito: siempre al mejor precio). */
+const TIER_UNICO: Tier[] = [{ key: "u", label: "Precio", min: 1, rango: "Precio por unidad" }];
+
 const TIERS_HILOS_PACKS: Tier[] = [
   { key: "x1", label: "x1", min: 1, rango: "1 a 11 packs" },
   { key: "x12", label: "x12", min: 12, rango: "12 packs o más" },
@@ -434,24 +437,26 @@ const HILOS: Product[] = [
     subtitle: "Hilo poliéster · 72 bobinas surtidas",
     unit: "c/u",
     variantName: "Presentación",
-    tiers: TIERS_HILOS,
-    variants: [{ label: "Cofre x72 bobinas", prices: [41990, 38200] }],
+    tiers: TIER_UNICO,
+    // Precio único: el precio pack de la planilla (el mejor).
+    variants: [{ label: "Cofre x72 bobinas", prices: [38200] }],
     images: ["1QejRpxLMMfCzYhTuJ6cPzD3ZMHADu5r0", "1fPzPF0Op2vD6Yp9cvx3NPOTcU3KtUIBA"],
   },
   {
     slug: "yute-6-2-bobina",
     category: "yute",
-    name: "Hilo de yute Corona 6/2 bobina 50 m",
-    title: "Yute 6/2 bobina",
-    subtitle: "Corona · bobina de 50 m",
-    unit: "c/u",
+    name: "Hilo de yute Corona 6/2 bobina 50 m - Pack x10",
+    title: "Yute 6/2 bobina x10",
+    subtitle: "Corona · pack de 10 bobinas de 50 m",
+    unit: "pack",
     variantName: "Presentación",
-    tiers: TIERS_HILOS,
-    variants: [
-      { label: "Unidad", prices: [1560, 1430], images: ["1DKFcrjrLGFnNe3m-RkDmgKfrobZs8xHF"] },
-      { label: "Pack x10", prices: [15620, 14320], images: ["1Qg9tHoK82_jrPEIsZvtLx1on35gw3-LK"] },
+    tiers: TIERS_HILOS_PACKS,
+    // Solo se vende el pack cerrado de 10 bobinas.
+    variants: [{ label: "Pack x10", prices: [15620, 14320] }],
+    images: [
+      "1Qg9tHoK82_jrPEIsZvtLx1on35gw3-LK", // pack x10
+      "1DKFcrjrLGFnNe3m-RkDmgKfrobZs8xHF", // una bobina, de referencia
     ],
-    images: ["1DKFcrjrLGFnNe3m-RkDmgKfrobZs8xHF", "1Qg9tHoK82_jrPEIsZvtLx1on35gw3-LK"],
   },
   {
     slug: "yute-6-2-cono",
