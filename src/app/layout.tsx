@@ -3,6 +3,7 @@ import Link from "next/link";
 import { CartDrawer } from "@/components/CartDrawer";
 import { CartProvider } from "@/components/CartProvider";
 import { Header } from "@/components/Header";
+import { OfflineStatus } from "@/components/OfflineStatus";
 import { SITE } from "@/lib/config";
 import "./globals.css";
 
@@ -19,6 +20,9 @@ export const metadata: Metadata = {
     locale: "es_AR",
     type: "website",
   },
+  manifest: "/manifest.webmanifest",
+  icons: { icon: "/favicon.png", apple: "/icons/apple-touch-icon.png" },
+  appleWebApp: { capable: true, title: "NOAR", statusBarStyle: "black-translucent" },
 };
 
 export const viewport: Viewport = { themeColor: "#0e0e0f", viewportFit: "cover" };
@@ -52,6 +56,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 )}
               </nav>
               <span className="muted small">Mercería mayorista · Proveedor de avíos · Buenos Aires</span>
+            </div>
+            <div className="wrap">
+              <OfflineStatus />
             </div>
           </footer>
           <CartDrawer />

@@ -1230,6 +1230,38 @@ html:has(.toolbar) {
 .footer-nav a:hover {
   color: var(--fg);
 }
+.offline-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: -12px 0 0;
+  padding-bottom: 24px;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.offline-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex: none;
+  background: var(--muted);
+}
+.offline-dot.listo {
+  background: var(--brass);
+}
+.offline-dot.bajando {
+  background: var(--brass);
+  animation: offline-pulse 1.2s ease-in-out infinite;
+}
+.offline-dot.error {
+  background: var(--warn);
+}
+@keyframes offline-pulse {
+  50% {
+    opacity: 0.3;
+  }
+}
 
 .empty-page {
   display: flex;
