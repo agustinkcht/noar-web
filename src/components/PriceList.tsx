@@ -59,21 +59,93 @@ export function PriceList() {
               <p className="muted small tier-legend">x12 = desde 12 unidades del mismo producto.</p>
             )}
             {c.id === "hilo-encerado" && (
-              <p className="muted small tier-legend">
-                Precio por bobina de 70 m. x16 = desde 16 bobinas del mismo color.
-              </p>
+              <p className="muted small tier-legend">x16 = desde 16 bobinas del mismo color.</p>
             )}
-            <div className="price-grid">
-              {items.map((p) => (
-                <PriceTable key={p.slug} product={p} />
-              ))}
-            </div>
+            {c.id === "hilo-elastico" && <p className="muted small tier-legend">x12 = desde 12 packs.</p>}
+            {MERGED[c.id] ? (
+              <MergedTable config={MERGED[c.id]!} items={items} />
+            ) : (
+              <div className="price-grid">
+                {items.map((p) => (
+                  <PriceTable key={p.slug} product={p} />
+                ))}
+              </div>
+            )}
           </section>
         );
       })}
 
       {filtered.length === 0 && <p className="muted empty">No encontramos productos con “{q}”.</p>}
     </>
+  );
+}
+
+/**
+ * Categorías que se muestran en un solo cuadro: una fila por producto (modelo o color).
+ */
+type Merged = { title: string; subtitle: string; col: string; row: (p: Product) => string };
+const MERGED: Partial<Record<string, Merged>> = {
+  "hilo-encerado": {
+    title: "Hilo encerado",
+    subtitle: "Bobina de 70 m",
+    col: "Modelo",
+    row: (p) => p.title,
+  },
+  yute: {
+    title: "Hilo de yute",
+    subtitle: "Corona",
+    col: "Modelo",
+    // "Yute 2mm 11/4" + "Rollo 50 m" → "Yute 2mm 11/4 rollo 50 m"; el pack x10 ya trae todo en el título.
+    row: (p) =>
+      /x10$/.test(p.title) ? p.title : `${p.title.replace(/ cono$/, "")} ${p.variants[0].label.toLowerCase()}`,
+  },
+  "hilo-elastico": {
+    title: "Hilo elástico",
+    subtitle: "Bobina de 25 m · precio por pack de 12 bobinas",
+    col: "Color",
+    row: (p) => {
+      const c = p.title.split(" ").pop() ?? p.title;
+      return c.charAt(0).toUpperCase() + c.slice(1);
+    },
+  },
+};
+
+function MergedTable({ config, items }: { config: Merged; items: Product[] }) {
+  const tiers = items[0].tiers;
+  return (
+    <div className="price-block price-merged">
+      <div className="price-head">
+        <h3>{config.title}</h3>
+        <p className="muted small">{config.subtitle}</p>
+      </div>
+      <div className="table-scroll">
+        <table className="price-table">
+          <thead>
+            <tr>
+              <th scope="col">{config.col}</th>
+              {tiers.map((t) => (
+                <th key={t.key} scope="col">
+                  {t.label}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {items.map((p) => (
+              <tr key={p.slug} id={p.slug}>
+                <th scope="row">
+                  <Link href={`/catalogo/${p.slug}/`}>{config.row(p)}</Link>
+                </th>
+                {tiers.map((_, i) => {
+                  const v = p.variants[0].prices[i];
+                  return <td key={i}>{v == null ? "—" : amount(v)}</td>;
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
   );
 }
 

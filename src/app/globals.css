@@ -1618,3 +1618,14 @@ html:has(.toolbar) {
     background: #ffffff;
   }
 }
+
+/* Cuadro único por categoría (hilos) */
+.price-merged {
+  max-width: 560px;
+}
+.price-merged .price-table tbody th a:hover {
+  color: var(--brass);
+}
+.price-merged tr:target {
+  outline: 1px solid var(--brass);
+}
