@@ -151,5 +151,5 @@ function buildMessage(lines: { slug: string; variant: number; qty: number; desl?
     })
     .filter(Boolean)
     .join("\n\n");
-  return `Resumen:\n\n${items}\n\nSubtotal productos: *$${total}*`;
+  return `¡Hola NOAR! Quiero hacer este pedido:\n\n${items}\n\nSubtotal productos: *$${total}*`;
 }
