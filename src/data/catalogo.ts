@@ -422,7 +422,7 @@ const HILOS: Product[] = [
     unit: "pack",
     variantName: "Presentación",
     tiers: TIERS_HILOS_PACKS,
-    variants: [{ label: "Pack x12 bobinas", prices: [4430, 4060] }],
+    variants: [{ label: "Pack x12 bobinas", prices: [4890, 4400] }],
     images: ["1G-G9ce-JPdD4o4zr5_4NeJIOEod97Mf1", "1Qh99OA0-HvFQZbDAi5YaH9yGn6CBlCiB"],
   },
   {
@@ -434,7 +434,7 @@ const HILOS: Product[] = [
     unit: "pack",
     variantName: "Presentación",
     tiers: TIERS_HILOS_PACKS,
-    variants: [{ label: "Pack x12 bobinas", prices: [5950, 5460] }],
+    variants: [{ label: "Pack x12 bobinas", prices: [5890, 5300] }],
     images: ["1JqYnXIIFAEwynLFCeLJWACnubWhAzx18", "1ybq7eGEroAkYl73FX0KFI14HSQIR0G1s"],
   },
   {
@@ -447,7 +447,7 @@ const HILOS: Product[] = [
     variantName: "Presentación",
     tiers: TIER_UNICO,
     // Precio único: el precio pack de la planilla (el mejor).
-    variants: [{ label: "Cofre x72 bobinas", prices: [38200] }],
+    variants: [{ label: "Cofre x72 bobinas", prices: [28800] }],
     images: ["1QejRpxLMMfCzYhTuJ6cPzD3ZMHADu5r0", "1fPzPF0Op2vD6Yp9cvx3NPOTcU3KtUIBA"],
   },
   {
@@ -460,7 +460,7 @@ const HILOS: Product[] = [
     variantName: "Presentación",
     tiers: TIERS_HILOS_PACKS,
     // Solo se vende el pack cerrado de 10 bobinas.
-    variants: [{ label: "Pack x10", prices: [15620, 14320] }],
+    variants: [{ label: "Pack x10", prices: [9800, 8820] }],
     images: [
       "1Qg9tHoK82_jrPEIsZvtLx1on35gw3-LK", // pack x10
       "1DKFcrjrLGFnNe3m-RkDmgKfrobZs8xHF", // una bobina, de referencia
@@ -475,7 +475,7 @@ const HILOS: Product[] = [
     unit: "c/u",
     variantName: "Presentación",
     tiers: TIERS_HILOS,
-    variants: [{ label: "Cono 500 m", prices: [15620, 14320] }],
+    variants: [{ label: "Cono 500 m", prices: [6800, 6120] }],
     images: ["1KQrvGymQPgeo95uBdncJL5igjfwcSCKq"],
   },
   {
@@ -487,7 +487,7 @@ const HILOS: Product[] = [
     unit: "c/u",
     variantName: "Presentación",
     tiers: TIERS_HILOS,
-    variants: [{ label: "Rollo 50 m", prices: [3870, 3580] }],
+    variants: [{ label: "Rollo 50 m", prices: [3900, 3510] }],
     images: ["19buE9nLJY1b6oje2pG_nytCEcd35Sttg"],
   },
   {
@@ -499,7 +499,7 @@ const HILOS: Product[] = [
     unit: "c/u",
     variantName: "Presentación",
     tiers: TIERS_HILOS,
-    variants: [{ label: "Rollo 50 m", prices: [3870, 3580] }],
+    variants: [{ label: "Rollo 50 m", prices: [3900, 3510] }],
     images: ["1ckaNzBhgr9TD3pVDPH6XubxDZ7l5qyDb"],
   },
   {
@@ -511,7 +511,7 @@ const HILOS: Product[] = [
     unit: "c/u",
     variantName: "Presentación",
     tiers: TIERS_HILOS,
-    variants: [{ label: "Rollo 30 m", prices: [5390, 4960] }],
+    variants: [{ label: "Rollo 30 m", prices: [3900, 3510] }],
     images: ["1TrPfH8wC7PAsVWCuM_Eu9A5ztgKvT7TL"],
   },
   {
@@ -523,7 +523,7 @@ const HILOS: Product[] = [
     unit: "c/u",
     variantName: "Presentación",
     tiers: TIERS_HILOS,
-    variants: [{ label: "Rollo 20 m", prices: [4590, 4190] }],
+    variants: [{ label: "Rollo 20 m", prices: [3900, 3510] }],
     images: ["1nk_MimgyA95u7R3Ti_WZj0Zj1DMuhrcZ"],
   },
 ];
@@ -603,7 +603,7 @@ const ENCERADOS: Product[] = [
       ["Gris Oscuro", "1t4Lcz3YU8KDYiGWHhCCv0CMqHduQoGCf"],
       ["Negro", "1mUpkKSiPbwsfVzE7GLsOH-MKjMfAmakG"],
     ],
-    [1280, 1180],
+    [1180, 980],
     "1i_8ta6er1GF_M4T2u-EczP2Fd6PDzY26", // Habano
   ),
   encerado(
@@ -616,7 +616,7 @@ const ENCERADOS: Product[] = [
       ["Rosa", "1OmN2HivYQJIS_TNbOYRsEK8LMeixH9qJ"],
       ["Verde", "18zl5JqoKw4FKdlBwVCTDQlNEZFwexV8Z"],
     ],
-    [1480, 1380],
+    [1280, 1080],
     "1UY8ci5k3lgOZywh2TL53-YgJT01y9wUM", // Amarillo
   ),
   encerado(
@@ -637,7 +637,7 @@ const ENCERADOS: Product[] = [
       ["Verde", "1aHWRVTKHMZWhrhDFmVgLNHE2tsdLU5cC"],
       ["Marrón", "1KdzSW93KUP4_jQEtQxtNpTJDPNu3gDcT"],
     ],
-    [1580, 1480],
+    [1280, 1080],
     "13ngOyNbPS2n3gT3DirpcJMEpvShqSM7Q", // Argentina
   ),
 ];
