@@ -159,7 +159,7 @@ export default function Imprimir() {
         </ol>
         <p className="pdf-site">
           {SITE.url.replace("https://", "")}
-          {SITE.whatsapp && <> · WhatsApp +{SITE.whatsapp}</>}
+          {SITE.whatsapp && <> · WhatsApp 11 3957-9989</>}
         </p>
       </section>
 

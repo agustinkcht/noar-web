@@ -11,7 +11,7 @@ export const SITE = {
    * Número de WhatsApp al que llegan los pedidos, en formato internacional
    * sin "+" ni espacios. Ej: "5491112345678".
    */
-  whatsapp: "",
+  whatsapp: "5491139579989",
   /** Envío gratis en GBA desde este subtotal. */
   envioGratisDesde: 120000,
 };
