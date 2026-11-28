@@ -52,6 +52,7 @@ export function OfflineStatus() {
           if (w.state === "activated") leerListo();
         });
       };
+      if (!reg) return;
       vigilar(reg.installing);
       reg.addEventListener("updatefound", () => vigilar(reg.installing));
     }, () => setEstado({ tipo: "error" }));

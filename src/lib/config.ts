@@ -14,7 +14,18 @@ export const SITE = {
   whatsapp: "5491139579989",
   /** Envío gratis en GBA desde este subtotal. */
   envioGratisDesde: 120000,
+  /**
+   * Cuentas y pedidos (Supabase). Son claves públicas: van en el código sin problema.
+   * Mientras estén vacías, el pedido se sigue mandando directo por WhatsApp.
+   */
+  supabaseUrl: process.env.NEXT_PUBLIC_SB_URL ?? "",
+  supabaseAnonKey: process.env.NEXT_PUBLIC_SB_KEY ?? "",
+  /** Clave de Google Maps (restringida a noar.ar) para buscar la dirección de envío. */
+  mapsKey: "",
 };
+
+/** Las cuentas están activas cuando hay proyecto de Supabase configurado. */
+export const CUENTAS_ACTIVAS = Boolean(SITE.supabaseUrl && SITE.supabaseAnonKey);
 
 /**
  * Fotos: procesadas con scripts/fotos.mjs y guardadas en /public/fotos (WebP de 480,

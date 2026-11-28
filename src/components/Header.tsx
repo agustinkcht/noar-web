@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { CUENTAS_ACTIVAS } from "@/lib/config";
 import { useCart } from "./CartProvider";
+import { AccountMenu } from "./cuenta/AccountMenu";
 
 const NAV = [
   { href: "/catalogo/", label: "Catálogo" },
@@ -35,6 +37,7 @@ export function Header() {
               {count}
             </span>
           </button>
+          {CUENTAS_ACTIVAS && <AccountMenu />}
         </nav>
       </div>
     </header>

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getProduct } from "@/data/catalogo";
-import { SITE } from "@/lib/config";
+import { CUENTAS_ACTIVAS, SITE } from "@/lib/config";
 import { lineName, money, tierIndex, tierQty, unitPrice, variantImages } from "@/lib/precios";
 import { useCart } from "./CartProvider";
 import { ProductImage } from "./ProductImage";
@@ -109,9 +109,15 @@ export function CartDrawer() {
                   : "Tu pedido tiene envío gratis en GBA."}
               </p>
               <div className="drawer-actions">
-                <a className="btn btn-send" href={waHref} target="_blank" rel="noopener noreferrer">
-                  Enviar pedido
-                </a>
+                {CUENTAS_ACTIVAS ? (
+                  <Link className="btn btn-send" href="/confirmar/" onClick={() => setOpen(false)}>
+                    Crear pedido
+                  </Link>
+                ) : (
+                  <a className="btn btn-send" href={waHref} target="_blank" rel="noopener noreferrer">
+                    Enviar pedido
+                  </a>
+                )}
                 <button
                   type="button"
                   className={`btn btn-ghost btn-clear${confirmClear ? " confirm" : ""}`}
